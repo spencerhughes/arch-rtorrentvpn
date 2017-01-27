@@ -22,7 +22,6 @@ echo "--------------------"
 ip route
 echo "--------------------"
 
-
 # setup iptables marks to allow routing of defined ports via eth0
 ###
 
