@@ -37,6 +37,7 @@ docker run -d \
     -e VPN_PROTOCOL=<vpn remote protocol> \
     -e VPN_DEVICE_TYPE=<tun|tap> \
     -e VPN_PROV=<pia|airvpn|custom> \
+    -e VPN_OPTIONS=<additional openvpn cli options> \
     -e STRONG_CERTS=<yes|no> \
     -e ENABLE_PRIVOXY=<yes|no> \
     -e ENABLE_FLOOD=<yes|no> \
