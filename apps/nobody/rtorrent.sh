@@ -69,7 +69,7 @@ else
 		if [[ ! -z "${vpn_ip}" ]]; then
 
 			# check if rtorrent is running, if not then skip reconfigure for port/ip
-			if ! pgrep -f /usr/bin/rtorrent > /dev/null; then
+			if ! pgrep -x rtorrent > /dev/null; then
 
 				echo "[info] rTorrent not running"
 
