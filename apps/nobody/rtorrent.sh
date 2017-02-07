@@ -155,7 +155,7 @@ else
 
 					echo "[info] Reconfiguring rTorrent due to ip change..."
 					xmlrpc "${xmlrpc_connection}" set_bind "${vpn_ip}" &>/dev/null
-					xmlrpc "${xmlrpc_connection}" set_ip "${vpn_ip}" &>/dev/null
+					xmlrpc "${xmlrpc_connection}" set_ip "${external_ip}" &>/dev/null
 					echo "[info] rTorrent reconfigured for ip change"
 
 				fi
@@ -205,12 +205,12 @@ else
 				if [[ "${VPN_PROV}" == "pia" || -n "${VPN_INCOMING_PORT}" ]]; then
 
 					# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface and port
-					/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -p ${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT} -o ip=${vpn_ip} -o dht_port=${VPN_INCOMING_PORT}"
+					/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -p ${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT} -o ip=${external_ip} -o dht_port=${VPN_INCOMING_PORT}"
 
 				else
 
 					# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface
-					/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -o ip=${vpn_ip}"
+					/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -o ip=${external_ip}"
 
 				fi
 
