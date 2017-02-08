@@ -41,9 +41,6 @@ else
 	# define connection to rtorrent rpc (used to reconfigure rtorrent)
 	xmlrpc_connection="localhost:9080"
 
-	# run script to check ip is valid for tunnel device
-	source /home/nobody/getvpnip.sh
-
 	# set triggers to first run
 	rtorrent_running="false"
 	ip_change="false"
