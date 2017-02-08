@@ -35,9 +35,6 @@ else
 
 	echo "[info] VPN is enabled, checking VPN tunnel local ip is valid"
 
-	# create pia client id (randomly generated)
-	client_id=`head -n 100 /dev/urandom | md5sum | tr -d " -"`
-
 	# define connection to rtorrent rpc (used to reconfigure rtorrent)
 	xmlrpc_connection="localhost:9080"
 
@@ -50,14 +47,8 @@ else
 	rtorrent_port="49160"
 	rtorrent_ip="0.0.0.0"
 
-	# remove previously run pid file (if it exists)
-	rm -f /home/nobody/downloader.sleep.pid
-	
 	# while loop to check ip and port
 	while true; do
-
-		# write the current session's pid to file (used to kill sleep process if rtorrent/openvpn terminates)
-		echo $$ > /home/nobody/downloader.sleep.pid
 
 		# run script to check ip is valid for tunnel device (will block until valid)
 		source /home/nobody/getvpnip.sh
@@ -243,12 +234,7 @@ else
 
 		fi
 
-		# if pia then throttle checks to 10 mins (to prevent hammering api for incoming port), else 30 secs
-		if [[ "${VPN_PROV}" == "pia" ]]; then
-			sleep 10m
-		else
-			sleep 30s
-		fi
+		sleep 30s
 
 	done
 
