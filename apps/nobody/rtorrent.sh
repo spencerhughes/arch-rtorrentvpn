@@ -124,42 +124,44 @@ else
 
 			fi
 
-			if [[ "${rtorrent_running}" == "true" ]]; then
+			if [[ "${port_change}" == "true" || "${ip_change}" == "true" || "${rtorrent_running}" == "false" ]]; then
 
 				# kill rtorrent (required due to the fact rtorrent cannot cope with dynamic changes to port)
-				if [[ "${port_change}" == "true" || "${ip_change}" == "true" ]]; then
+				if [[ "${rtorrent_running}" == "true" ]]; then
 
 					# get pid for rtorrent running under tmux
 					rtorrent_pid=$(pgrep -x "rtorrent main")
 
+					echo "[info] Sending SIGINT to rTorrent due to config change..."
+					
 					# kill rtorrent process by sending SIGINT (soft shutdown)
 					kill -2 "${rtorrent_pid}"
 
 				fi
 
+				echo "[info] Removing any rtorrent session lock files left over from the previous run..."
+				rm -f /config/rtorrent/session/*.lock
+
+				echo "[info] Attempting to start rTorrent..."
+
+				if [[ "${VPN_PROV}" == "pia" || -n "${VPN_INCOMING_PORT}" ]]; then
+
+					# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface and port
+					/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -p ${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT} -o ip=${external_ip} -o dht_port=${VPN_INCOMING_PORT}"
+
+				else
+
+					# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface
+					/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -o ip=${external_ip}"
+
+				fi
+
+				echo "[info] rTorrent started"
+
+				# run script to initialise rutorrent plugins
+				source /home/nobody/initplugins.sh
+
 			fi
-
-			echo "[info] Attempting to start rTorrent..."
-
-			echo "[info] Removing any rtorrent session lock files left over from the previous run..."
-			rm -f /config/rtorrent/session/*.lock
-
-			if [[ "${VPN_PROV}" == "pia" || -n "${VPN_INCOMING_PORT}" ]]; then
-
-				# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface and port
-				/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -p ${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT} -o ip=${external_ip} -o dht_port=${VPN_INCOMING_PORT}"
-
-			else
-
-				# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface
-				/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -o ip=${external_ip}"
-
-			fi
-
-			echo "[info] rTorrent started"
-			
-			# run script to initialise rutorrent plugins
-			source /home/nobody/initplugins.sh
 
 			# set rtorrent ip and port to current vpn ip and port (used when checking for changes on next run)
 			rtorrent_ip="${vpn_ip}"
