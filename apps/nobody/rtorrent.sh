@@ -126,89 +126,40 @@ else
 
 			if [[ "${rtorrent_running}" == "true" ]]; then
 
-				if [[ "${VPN_PROV}" == "pia" ]]; then
-
-					# reconfigure rtorrent with new port
-					if [[ "${port_change}" == "true" ]]; then
-
-						echo "[info] Reconfiguring rTorrent due to port change..."
-						xmlrpc "${xmlrpc_connection}" set_port_range "${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT}" &>/dev/null
-						xmlrpc "${xmlrpc_connection}" set_dht_port "${VPN_INCOMING_PORT}" &>/dev/null
-						echo "[info] rTorrent reconfigured for port change"
-
-					fi
-				fi
-
-				# reconfigure rtorrent with new ip
-				if [[ "${ip_change}" == "true" ]]; then
-
-					echo "[info] Reconfiguring rTorrent due to ip change..."
-					xmlrpc "${xmlrpc_connection}" set_bind "${vpn_ip}" &>/dev/null
-					xmlrpc "${xmlrpc_connection}" set_ip "${external_ip}" &>/dev/null
-					echo "[info] rTorrent reconfigured for ip change"
-
-				fi
-
-				# pause/resume "started" torrents after port/ip change (required to reconnect)
+				# kill rtorrent (required due to the fact rtorrent cannot cope with dynamic changes to port)
 				if [[ "${port_change}" == "true" || "${ip_change}" == "true" ]]; then
 
-					# get space seperated list of torrents with status "started"
-					torrent_hash_string=$(xmlrpc localhost:9080 download_list "i/0" "started" | grep -P -o "\'[a-zA-Z0-9]+\'" | xargs)
-					echo "[info] List of torrent hashes to pause/resume is ${torrent_hash_string}"
+					# get pid for rtorrent running under tmux
+					rtorrent_pid=$(pgrep -x "rtorrent main")
 
-					# if torrent_hash_string is not empty then pause/resume running torrents
-					if [[ ! -z "${torrent_hash_string}" ]]; then
-
-						echo "[info] Pausing and resuming started torrents due to port/ip change..."
-
-						# convert space seperated string to array
-						read -ra torrent_hash_array <<< "${torrent_hash_string}"
-
-						# loop over list of torrent hashes and pause/resume
-						for torrent_hash_item in "${torrent_hash_array[@]}"; do
-
-							if [[ "${DEBUG}" == "true" ]]; then
-								echo "[debug] Pausing/resuming torrent hash ${torrent_hash_item}"
-							fi
-
-							xmlrpc "${xmlrpc_connection}" d.pause "${torrent_hash_item}" &>/dev/null
-							xmlrpc "${xmlrpc_connection}" d.resume "${torrent_hash_item}" &>/dev/null
-
-						done
-
-					else
-
-						echo "[info] No torrents with status of started found, skipping pause/resume cycle"
-
-					fi
+					# kill rtorrent process by sending SIGINT (soft shutdown)
+					kill -2 "${rtorrent_pid}"
 
 				fi
+
+			fi
+
+			echo "[info] Attempting to start rTorrent..."
+
+			echo "[info] Removing any rtorrent session lock files left over from the previous run..."
+			rm -f /config/rtorrent/session/*.lock
+
+			if [[ "${VPN_PROV}" == "pia" || -n "${VPN_INCOMING_PORT}" ]]; then
+
+				# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface and port
+				/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -p ${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT} -o ip=${external_ip} -o dht_port=${VPN_INCOMING_PORT}"
 
 			else
 
-				echo "[info] Attempting to start rTorrent..."
-
-				echo "[info] Removing any rtorrent session lock files left over from the previous run..."
-				rm -f /config/rtorrent/session/*.lock
-
-				if [[ "${VPN_PROV}" == "pia" || -n "${VPN_INCOMING_PORT}" ]]; then
-
-					# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface and port
-					/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -p ${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT} -o ip=${external_ip} -o dht_port=${VPN_INCOMING_PORT}"
-
-				else
-
-					# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface
-					/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -o ip=${external_ip}"
-
-				fi
-
-				echo "[info] rTorrent started"
-				
-				# run script to initialise rutorrent plugins
-				source /home/nobody/initplugins.sh
+				# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface
+				/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -o ip=${external_ip}"
 
 			fi
+
+			echo "[info] rTorrent started"
+			
+			# run script to initialise rutorrent plugins
+			source /home/nobody/initplugins.sh
 
 			# set rtorrent ip and port to current vpn ip and port (used when checking for changes on next run)
 			rtorrent_ip="${vpn_ip}"
