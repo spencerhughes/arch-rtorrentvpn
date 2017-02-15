@@ -129,13 +129,16 @@ else
 				# kill rtorrent (required due to the fact rtorrent cannot cope with dynamic changes to port)
 				if [[ "${rtorrent_running}" == "true" ]]; then
 
-					# get pid for rtorrent running under tmux
-					rtorrent_pid=$(pgrep -x "rtorrent main")
+					echo "[info] Sending SIGINT to rTorrent due to port/ip change..."
 
-					echo "[info] Sending SIGINT to rTorrent due to config change..."
-					
 					# kill rtorrent process by sending SIGINT (soft shutdown)
-					kill -2 "${rtorrent_pid}"
+					pkill -INT "rtorrent main"
+
+					# make sure pid for rtorrent DOESNT exist before re-starting
+					while pgrep -x "rtorrent main" &> /dev/null
+					do
+						sleep 0.1s
+					done
 
 				fi
 
@@ -155,6 +158,12 @@ else
 					/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -o ip=${external_ip}"
 
 				fi
+
+				# make sure pid for rtorrent DOES exist before re-checking
+				while ! pgrep -x "rtorrent main" &> /dev/null
+				do
+					sleep 0.1s
+				done
 
 				echo "[info] rTorrent started"
 
