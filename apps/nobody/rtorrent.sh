@@ -81,6 +81,9 @@ else
 
 			fi
 
+			# run scripts to identify external ip address
+			source /home/nobody/getvpnextip.sh
+
 			if [[ "${VPN_PROV}" == "pia" ]]; then
 
 				# run scripts to identify vpn port
