@@ -85,6 +85,7 @@ docker run -d \
     -p 9080:9080 \
     -p 9443:9443 \
     -p 8118:8118 \
+    -p 3000:3000 \
     --name=rtorrentvpn \
     -v /root/docker/data:/data \
     -v /root/docker/config:/config \
