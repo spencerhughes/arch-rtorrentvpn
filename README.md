@@ -46,6 +46,7 @@ docker run -d \
     -e NAME_SERVERS=<name server ip(s)> \
     -e DEBUG=<true|false> \
     -e PHP_TZ=<php timezone> \
+    -e UMASK=<umask for created files> \
     -e PUID=<uid for user> \
     -e PGID=<gid for user> \
     binhex/arch-rtorrentvpn
@@ -105,6 +106,7 @@ docker run -d \
     -e NAME_SERVERS=8.8.8.8,8.8.4.4 \
     -e DEBUG=false \
     -e PHP_TZ=UTC \
+    -e UMASK=0000 \
     -e PUID=0 \
     -e PGID=0 \
     binhex/arch-rtorrentvpn
@@ -158,6 +160,7 @@ docker run -d \
     -e NAME_SERVERS=8.8.8.8,8.8.4.4 \
     -e DEBUG=false \
     -e PHP_TZ=UTC \
+    -e UMASK=0000 \
     -e PUID=0 \
     -e PGID=0 \
     binhex/arch-rtorrentvpn
