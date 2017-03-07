@@ -106,7 +106,7 @@ docker run -d \
     -e NAME_SERVERS=8.8.8.8,8.8.4.4 \
     -e DEBUG=false \
     -e PHP_TZ=UTC \
-    -e UMASK=0000 \
+    -e UMASK=000 \
     -e PUID=0 \
     -e PGID=0 \
     binhex/arch-rtorrentvpn
@@ -116,6 +116,13 @@ docker run -d \
 
 AirVPN users will need to generate a unique OpenVPN configuration file by using the following link https://airvpn.org/generator/
 
+1. Please select Linux and then choose the country you want to connect to
+2. Save the ovpn file to somewhere safe
+3. Start the rtorrentvpn docker to create the folder structure
+4. Stop rtorrentvpn docker and copy the saved ovpn file to the /config/openvpn/ folder on the host
+5. Start rtorrentvpn docker
+6. Check supervisor.log to make sure you are connected to the tunnel
+
 AirVPN users will also need to create a port forward by using the following link https://airvpn.org/ports/ and clicking Add. This port will need to be specified in the rTorrent configuration file located at /config/rtorrent/config/rtorrent.rc with the option `port_range = <start incoming port>-<end incoming port>` and `port_random = no`.
 
 rTorrent example config
@@ -123,13 +130,6 @@ rTorrent example config
 port_range = 49400-49400
 port_random = no
 ```
-
-1. Please select Linux and then choose the country you want to connect to
-2. Save the ovpn file to somewhere safe
-3. Start the rtorrentvpn docker to create the folder structure
-4. Stop rtorrentvpn docker and copy the saved ovpn file to the /config/openvpn/ folder on the host
-5. Start rtorrentvpn docker
-6. Check supervisor.log to make sure you are connected to the tunnel
 
 **AirVPN example**
 ```
@@ -155,7 +155,7 @@ docker run -d \
     -e NAME_SERVERS=8.8.8.8,8.8.4.4 \
     -e DEBUG=false \
     -e PHP_TZ=UTC \
-    -e UMASK=0000 \
+    -e UMASK=000 \
     -e PUID=0 \
     -e PGID=0 \
     binhex/arch-rtorrentvpn
