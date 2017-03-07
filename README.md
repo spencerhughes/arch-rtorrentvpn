@@ -121,9 +121,11 @@ This port will need to be specified in the file
 /config/rtorrent/config/rtorrent.rc with the option 'port_range = <port>'
 and 'port_random = no'.
 
+```
 # example
 port_range = 49400-49400
 port_random = no
+```
 
 1. Please select Linux and then choose the country you want to connect to
 2. Save the ovpn file to somewhere safe
