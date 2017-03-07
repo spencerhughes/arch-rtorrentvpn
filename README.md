@@ -25,6 +25,7 @@ docker run -d \
     -p 9080:9080 \
     -p 9443:9443 \
     -p 8118:8118 \
+    -p 3000:3000 \
     --name=<container name> \
     -v <path for data files>:/data \
     -v <path for config files>:/config \
@@ -40,7 +41,7 @@ docker run -d \
     -e VPN_OPTIONS=<additional openvpn cli options> \
     -e STRONG_CERTS=<yes|no> \
     -e ENABLE_PRIVOXY=<yes|no> \
-    -e ENABLE_FLOOD=<yes|no> \
+    -e ENABLE_FLOOD=<yes|no|both> \
     -e LAN_NETWORK=<lan ipv4 network>/<cidr notation> \
     -e NAME_SERVERS=<name server ip(s)> \
     -e DEBUG=<true|false> \
@@ -84,6 +85,7 @@ docker run -d \
     -p 9080:9080 \
     -p 9443:9443 \
     -p 8118:8118 \
+    -p 3000:3000 \
     --name=rtorrentvpn \
     -v /root/docker/data:/data \
     -v /root/docker/config:/config \
@@ -113,11 +115,21 @@ docker run -d \
 AirVPN users will need to generate a unique OpenVPN configuration
 file by using the following link https://airvpn.org/generator/
 
+AirVPN users will also need to create a port forward by using
+the following link https://airvpn.org/ports/ and clicking Add.
+This port will need to be specified in the file
+/config/rtorrent/config/rtorrent.rc with the option 'port_range = <port>'
+and 'port_random = no'.
+
+# example
+port_range = 49400-49400
+port_random = no
+
 1. Please select Linux and then choose the country you want to connect to
 2. Save the ovpn file to somewhere safe
-3. Start the delugevpn docker to create the folder structure
-4. Stop delugevpn docker and copy the saved ovpn file to the /config/openvpn/ folder on the host
-5. Start delugevpn docker
+3. Start the rtorrentvpn docker to create the folder structure
+4. Stop rtorrentvpn docker and copy the saved ovpn file to the /config/openvpn/ folder on the host
+5. Start rtorrentvpn docker
 6. Check supervisor.log to make sure you are connected to the tunnel
 
 **AirVPN example**
@@ -127,6 +139,7 @@ docker run -d \
     -p 9080:9080 \
     -p 9443:9443 \
     -p 8118:8118 \
+    -p 3000:3000 \
     --name=rtorrentvpn \
     -v /root/docker/data:/data \
     -v /root/docker/config:/config \
