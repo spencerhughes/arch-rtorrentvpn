@@ -114,17 +114,12 @@ docker run -d \
 
 **AirVPN provider**
 
-AirVPN users will need to generate a unique OpenVPN configuration
-file by using the following link https://airvpn.org/generator/
+AirVPN users will need to generate a unique OpenVPN configuration file by using the following link https://airvpn.org/generator/
 
-AirVPN users will also need to create a port forward by using
-the following link https://airvpn.org/ports/ and clicking Add.
-This port will need to be specified in the file
-/config/rtorrent/config/rtorrent.rc with the option 'port_range = <port>'
-and 'port_random = no'.
+AirVPN users will also need to create a port forward by using the following link https://airvpn.org/ports/ and clicking Add. This port will need to be specified in the rTorrent configuration file located at /config/rtorrent/config/rtorrent.rc with the option 'port_range = <port>' and 'port_random = no'.
 
+rTorrent example config
 ```
-# example
 port_range = 49400-49400
 port_random = no
 ```
