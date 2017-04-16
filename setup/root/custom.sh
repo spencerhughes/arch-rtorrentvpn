@@ -6,7 +6,7 @@ set -e
 flood_install_path="/etc/webapps/flood"
 
 # download flood from master branch (no current release)
-curl -o /tmp/flood.zip -L https://github.com/jfurrow/flood/archive/master.zip
+curl --connect-timeout 5 --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 60 -o /tmp/flood.zip -L https://github.com/jfurrow/flood/archive/master.zip
 
 # extract to /tmp
 unzip /tmp/flood.zip -d /tmp
