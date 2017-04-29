@@ -39,7 +39,7 @@ source /root/aor.sh
 ####
 
 # define aur packages
-aur_packages="rutorrent apache-tools"
+aur_packages="rutorrent"
 
 # call aur install script (arch user repo)
 source /root/aur.sh
