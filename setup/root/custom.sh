@@ -3,21 +3,31 @@
 # exit script if return code != 0
 set -e
 
-flood_install_path="/etc/webapps/flood"
+repo_name="jfurrow"
+app_name="flood"
+install_name="flood"
+install_folder="/etc/webapps/flood"
 
-# download flood from master branch (no current release)
-curl --connect-timeout 5 --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 60 -o /tmp/flood.zip -L https://github.com/jfurrow/flood/archive/master.zip
+# find latest release tag from github
+release_tag=$(curl --connect-timeout 5 --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 60 -s "https://github.com/${repo_name}/${app_name}/releases" | grep -P -o -m 1 "(?<=/${repo_name}/${app_name}/releases/tag/)[^\"]+")
 
-# extract to /tmp
-unzip /tmp/flood.zip -d /tmp
+# download install zip file
+curl --connect-timeout 5 --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 60 -o "/tmp/${app_name}-release.zip" -L "https://github.com/${repo_name}/${app_name}/archive/${release_tag}.zip"
 
-# create folder for flood and move to it
-mkdir -p "${flood_install_path}"
+# unzip to /tmp
+unzip "/tmp/${app_name}-release.zip" -d /tmp
 
-mv /tmp/flood-master/* "${flood_install_path}"
+# create destination directories
+mkdir -p "${install_folder}/"
+
+# move to destination folder
+mv /tmp/${app_name}*/* "${install_folder}/"
+
+# remove source zip file
+rm "/tmp/${app_name}-release.zip"
 
 # install flood
-cd "${flood_install_path}" && npm install --production
+cd "${install_folder}" && npm install --production
 
 # download htpasswd (problems with apache-tools and openssl 1.1.x)
 curl --connect-timeout 5 --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 60 -o /tmp/htpasswd.tar.gz -L https://github.com/binhex/arch-packages/raw/master/compiled/htpasswd.tar.gz
