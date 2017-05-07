@@ -162,16 +162,39 @@ else
 
 				fi
 
-				# make sure pid for rtorrent DOES exist before re-checking
-				while ! pgrep -x "rtorrent main" &> /dev/null
-				do
-					sleep 0.1s
+				# make sure process rtorrent DOES exist before starting rutorrent plugins
+				retry_count=30
+				while true; do
+
+					if ! pgrep -x "rtorrent main" > /dev/null; then
+
+						retry_count=$((retry_count-1))
+						if [ "${retry_count}" -eq "0" ]; then
+
+							echo "[warn] Wait for rTorrent process to start aborted"
+							break
+
+						else
+
+							if [[ "${DEBUG}" == "true" ]]; then
+								echo "[debug] Waiting for rTorrent process to start..."
+							fi
+
+							sleep 1s
+
+						fi
+
+					else
+
+						echo "[info] rTorrent started"
+
+						# run script to initialise rutorrent plugins
+						source /home/nobody/initplugins.sh
+						break
+
+					fi
+
 				done
-
-				echo "[info] rTorrent started"
-
-				# run script to initialise rutorrent plugins
-				source /home/nobody/initplugins.sh
 
 			fi
 
