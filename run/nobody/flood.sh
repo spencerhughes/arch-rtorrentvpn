@@ -22,7 +22,7 @@ if [[ "${ENABLE_FLOOD}" == "yes" || "${ENABLE_FLOOD}" == "both" ]]; then
 
 		echo "[info] Flood config file doesnt exist in /config/flood/, copying from container..."
 		mkdir -p "${flood_config_path}/"
-		cp -f "${flood_install_path}/config-backup.js" "${flood_config_path}/config.js"
+		cp -f "${flood_install_path}/config.js" "${flood_config_path}/config.js"
 
 	else
 
