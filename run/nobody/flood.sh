@@ -12,24 +12,21 @@ if [[ "${ENABLE_FLOOD}" == "yes" || "${ENABLE_FLOOD}" == "both" ]]; then
 
 	echo "[info] rTorrent started, configuring Flood..."
 
+	# if flood config file doesnt exist then copy from containr to /config, and back again to capture user changes (cannot soft link thus copy back)
 	flood_config_path="/config/flood/config"
 	flood_install_path="/etc/webapps/flood"
 
-	# if flood config file doesnt exist then copy default to host config volume
-	# note flood does not support softlink of config file, thus we need to
-	# copy from /config/flood back to the container.
 	if [ ! -f "${flood_config_path}/config.js" ]; then
 
-		echo "[info] Flood config file doesnt exist in /config/flood/, copying from container..."
+		echo "[info] Flood config file ${flood_config_path}/config.js doesnt exist, copying from container..."
 		mkdir -p "${flood_config_path}/"
-		cp -f "${flood_install_path}/config.js" "${flood_config_path}/config.js"
-
-	else
-
-		echo "[info] Flood config file already exists in /config/flood/, copying back to container..."
-		cp -f "${flood_config_path}/config.js" "${flood_install_path}/config.js"
+		cp -f "${flood_install_path}/config-backup.js" "${flood_config_path}/config.js"
 
 	fi
+
+	echo "[info] Copying Flood config file ${flood_config_path}/config.js back to container..."
+	mkdir -p "${flood_install_path}/"
+	cp -f "${flood_config_path}/config.js" "${flood_install_path}/config.js"
 
 	echo "[info] Starting Flood..."
 
