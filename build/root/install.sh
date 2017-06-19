@@ -109,7 +109,7 @@ rm -rf "/usr/share/webapps/rutorrent/plugins/tracklabels" "/usr/share/webapps/ru
 ####
 
 # copy config template file
-cp /etc/webapps/flood/config.template.js /etc/webapps/flood/config.js
+cp /etc/webapps/flood/config.template.js /etc/webapps/flood/config-backup.js
 
 # modify template with connection details to rtorrent
 sed -i "s~host: 'localhost'~host: '127.0.0.1'~g" /etc/webapps/flood/config-backup.js
