@@ -112,17 +112,17 @@ rm -rf "/usr/share/webapps/rutorrent/plugins/tracklabels" "/usr/share/webapps/ru
 cp /etc/webapps/flood/config.template.js /etc/webapps/flood/config-backup.js
 
 # modify template with connection details to rtorrent
-sed -i "s~host: 'localhost'~host: '127.0.0.1'~g" /etc/webapps/flood/config-backup.js
+sed -i "s~host:.*~host: '127.0.0.1',~g" /etc/webapps/flood/config-backup.js
 
 # point key and cert at nginx (note ssl not enabled by default)
-sed -i "s~sslKey: '/absolute/path/to/key/'~sslKey: '/config/nginx/certs/host.key'~g" /etc/webapps/flood/config-backup.js
-sed -i "s~sslCert: '/absolute/path/to/certificate/'~sslCert: '/config/nginx/certs/host.cert'~g" /etc/webapps/flood/config-backup.js
+sed -i "s~sslKey:.*~sslKey: '/config/nginx/certs/host.key',~g" /etc/webapps/flood/config-backup.js
+sed -i "s~sslCert:.*~sslCert: '/config/nginx/certs/host.cert',~g" /etc/webapps/flood/config-backup.js
 
 # set location of database (stores settings and user accounts)
-sed -i "s~dbPath: './server/db/'~dbPath: '/config/flood/db/'~g" /etc/webapps/flood/config-backup.js
+sed -i "s~dbPath:.*~dbPath: '/config/flood/db/',~g" /etc/webapps/flood/config-backup.js
 
-# remove floodServerHost entry from config file (causes flood to crash on startup)
-sed -i '/floodServerHost.*/d' /etc/webapps/flood/config-backup.js
+# set ip of host (talk on all ip's)
+sed -i "s~floodServerHost.*~floodServerHost: '0.0.0.0',~g" /etc/webapps/flood/config-backup.js
 
 # container perms
 ####
