@@ -40,6 +40,7 @@ docker run -d \
     -e VPN_PROV=<pia|airvpn|custom> \
     -e VPN_OPTIONS=<additional openvpn cli options> \
     -e STRONG_CERTS=<yes|no> \
+    -e STRICT_PORT_FORWARD=<yes|no> \
     -e ENABLE_PRIVOXY=<yes|no> \
     -e ENABLE_FLOOD=<yes|no|both> \
     -e LAN_NETWORK=<lan ipv4 network>/<cidr notation> \
@@ -100,6 +101,7 @@ docker run -d \
     -e VPN_DEVICE_TYPE=tun \
     -e VPN_PROV=pia \
     -e STRONG_CERTS=no \
+    -e STRICT_PORT_FORWARD=yes \
     -e ENABLE_PRIVOXY=yes \
     -e ENABLE_FLOOD=yes \
     -e LAN_NETWORK=192.168.1.0/24 \
