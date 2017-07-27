@@ -148,7 +148,7 @@ rm /tmp/permissions_heredoc
 # env vars
 ####
 
-cat <<'EOF' > /tmp/envvars_heredoc
+#cat <<'EOF' > /tmp/envvars_heredoc
 
 # check for presence of network interface docker0
 check_network=$(ifconfig | grep docker0 || true)
@@ -221,14 +221,13 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 	export VPN_PROTOCOL=$(cat "/config/openvpn/${VPN_CONFIG}" | grep -Po '(?<=proto\s)[^\r\n]+')
 	if [[ ! -z "${VPN_PROTOCOL}" ]]; then
 		echo "[info] VPN_PROTOCOL defined as '${VPN_PROTOCOL}'" | ts '%Y-%m-%d %H:%M:%.S'
-
 		# required for use in iptables
 		if [[ "${VPN_PROTOCOL}" == "tcp-client" ]]; then
-			VPN_PROTOCOL="tcp"
+			export VPN_PROTOCOL="tcp"
 		fi
-
 	else
-		echo "[crit] VPN_PROTOCOL not found in /config/openvpn/${VPN_CONFIG}, exiting..." | ts '%Y-%m-%d %H:%M:%.S' && exit 1
+		echo "[warn] VPN_PROTOCOL not found in /config/openvpn/${VPN_CONFIG}, assuming udp" | ts '%Y-%m-%d %H:%M:%.S'
+		export VPN_PROTOCOL="udp"
 	fi
 
 	export VPN_DEVICE_TYPE=$(cat "/config/openvpn/${VPN_CONFIG}" | grep -Po '(?<=dev\s)[^\r\n]+')
