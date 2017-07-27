@@ -197,7 +197,7 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 	/usr/bin/dos2unix "${VPN_CONFIG}"
 
 	# parse values from ovpn file
-	export vpn_remote_line=$(cat "/config/openvpn/${VPN_CONFIG}" | grep -Po '(?<=remote\s)[^\n\r]+')
+	export vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -Po '(?<=remote\s)[^\n\r]+')
 	if [[ ! -z "${vpn_remote_line}" ]]; then
 		echo "[info] 'remote' line defined as '${vpn_remote_line}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
