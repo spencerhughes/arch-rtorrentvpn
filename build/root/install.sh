@@ -148,7 +148,7 @@ rm /tmp/permissions_heredoc
 # env vars
 ####
 
-cat <<'EOF' > /tmp/envvars_heredoc
+#cat <<'EOF' > /tmp/envvars_heredoc
 
 # check for presence of network interface docker0
 check_network=$(ifconfig | grep docker0 || true)
@@ -199,9 +199,9 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 	# parse values from ovpn file
 	export vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -Po '(?<=remote\s)[^\n\r]+')
 	if [[ ! -z "${vpn_remote_line}" ]]; then
-		echo "[info] 'remote' line defined as '${vpn_remote_line}'" | ts '%Y-%m-%d %H:%M:%.S'
+		echo "[info] VPN remote line defined as '${vpn_remote_line}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
-		echo "[crit] 'remote' line not found in /config/openvpn/${VPN_CONFIG}, exiting..." | ts '%Y-%m-%d %H:%M:%.S' && exit 1
+		echo "[crit] VPN configuration file /config/openvpn/${VPN_CONFIG} does not contain 'remote' line, exiting..." | ts '%Y-%m-%d %H:%M:%.S' && exit 1
 	fi
 
 	export VPN_REMOTE=$(echo "${vpn_remote_line}" | grep -Po '^[^\s\r\n]+')
