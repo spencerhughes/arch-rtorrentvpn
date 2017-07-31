@@ -194,10 +194,10 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 	echo "[info] VPN config file (ovpn extension) is located at ${VPN_CONFIG}" | ts '%Y-%m-%d %H:%M:%.S'
 
 	# convert CRLF (windows) to LF (unix) for ovpn
-	/usr/bin/dos2unix "${VPN_CONFIG}"
+	/usr/bin/dos2unix "${VPN_CONFIG}" 1> /dev/null
 
 	# parse values from ovpn file
-	export vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -Po '(?<=remote\s)[^\n\r]+')
+	export vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -Po '(?<=^remote\s)[^\n\r]+')
 	if [[ ! -z "${vpn_remote_line}" ]]; then
 		echo "[info] VPN remote line defined as '${vpn_remote_line}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
@@ -218,7 +218,7 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 		echo "[crit] VPN_PORT not found in /config/openvpn/${VPN_CONFIG}, exiting..." | ts '%Y-%m-%d %H:%M:%.S' && exit 1
 	fi
 
-	export VPN_PROTOCOL=$(cat "${VPN_CONFIG}" | grep -Po '(?<=proto\s)[^\r\n]+')
+	export VPN_PROTOCOL=$(cat "${VPN_CONFIG}" | grep -Po '(?<=^proto\s)[^\r\n]+')
 	if [[ ! -z "${VPN_PROTOCOL}" ]]; then
 		echo "[info] VPN_PROTOCOL defined as '${VPN_PROTOCOL}'" | ts '%Y-%m-%d %H:%M:%.S'
 		# required for use in iptables
@@ -230,7 +230,7 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 		export VPN_PROTOCOL="udp"
 	fi
 
-	export VPN_DEVICE_TYPE=$(cat "${VPN_CONFIG}" | grep -Po '(?<=dev\s)[^\r\n]+')
+	export VPN_DEVICE_TYPE=$(cat "${VPN_CONFIG}" | grep -Po '(?<=^dev\s)[^\r\n]+')
 	if [[ ! -z "${VPN_DEVICE_TYPE}" ]]; then
 		echo "[info] VPN_DEVICE_TYPE defined as '${VPN_DEVICE_TYPE}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
