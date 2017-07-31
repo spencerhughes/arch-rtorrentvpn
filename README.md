@@ -171,7 +171,7 @@ docker exec -it <container name> /home/nobody/deluser.sh <username to delete>
 
 If you do not define the PHP timezone you may see issues with the ruTorrent Scheduler plugin, please make sure you set the PHP timezone by specifying this using the environment variable PHP_TZ. Valid timezone values can be found here, http://php.net/manual/en/timezones.php
 
-The STRONG_CERTS environment variable is used to define whether to use strong certificates and enhanced encryption ciphers when connecting to PIA (does not affect other providers).
+The STRICT_PORT_FORWARD environment variable is used to define whether to force connection only to endpoints that support port forwarding when connecting to PIA (does not affect other providers).
 ___
 If you appreciate my work, then please consider buying me a beer  :D
 
