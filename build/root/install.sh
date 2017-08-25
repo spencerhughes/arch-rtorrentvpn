@@ -148,7 +148,7 @@ rm /tmp/permissions_heredoc
 # env vars
 ####
 
-#cat <<'EOF' > /tmp/envvars_heredoc
+cat <<'EOF' > /tmp/envvars_heredoc
 
 # check for presence of network interface docker0
 check_network=$(ifconfig | grep docker0 || true)
