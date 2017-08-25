@@ -148,7 +148,7 @@ rm /tmp/permissions_heredoc
 # env vars
 ####
 
-cat <<'EOF' > /tmp/envvars_heredoc
+#cat <<'EOF' > /tmp/envvars_heredoc
 
 # check for presence of network interface docker0
 check_network=$(ifconfig | grep docker0 || true)
@@ -197,8 +197,7 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 	/usr/bin/dos2unix "${VPN_CONFIG}" 1> /dev/null
 
 	# parse values from ovpn file
-	vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '(?<=^remote\s)[^\n\r]+')
-	export vpn_remote_line=$(echo "${vpn_remote_line}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+	export vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '(?<=^remote\s)[^\n\r]+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 	if [[ ! -z "${vpn_remote_line}" ]]; then
 		echo "[info] VPN remote line defined as '${vpn_remote_line}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
@@ -206,29 +205,25 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 		cat "${VPN_CONFIG}" && exit 1
 	fi
 
-	VPN_REMOTE=$(echo "${vpn_remote_line}" | grep -P -o -m 1 '^[^\s\r\n]+')
-	export VPN_REMOTE=$(echo "${VPN_REMOTE}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+	export VPN_REMOTE=$(echo "${vpn_remote_line}" | grep -P -o -m 1 '^[^\s\r\n]+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 	if [[ ! -z "${VPN_REMOTE}" ]]; then
 		echo "[info] VPN_REMOTE defined as '${VPN_REMOTE}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
 		echo "[crit] VPN_REMOTE not found in ${VPN_CONFIG}, exiting..." | ts '%Y-%m-%d %H:%M:%.S' && exit 1
 	fi
 
-	VPN_PORT=$(echo "${vpn_remote_line}" | grep -P -o -m 1 '(?<=\s)\d{2,5}(?=\s)?+')
-	export VPN_PORT=$(echo "${VPN_PORT}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+	export VPN_PORT=$(echo "${vpn_remote_line}" | grep -P -o -m 1 '(?<=\s)\d{2,5}(?=\s)?+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 	if [[ ! -z "${VPN_PORT}" ]]; then
 		echo "[info] VPN_PORT defined as '${VPN_PORT}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
 		echo "[crit] VPN_PORT not found in ${VPN_CONFIG}, exiting..." | ts '%Y-%m-%d %H:%M:%.S' && exit 1
 	fi
 
-	VPN_PROTOCOL=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '(?<=^proto\s)[^\r\n]+')
-	export VPN_PROTOCOL=$(echo "${VPN_PROTOCOL}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+	export VPN_PROTOCOL=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '(?<=^proto\s)[^\r\n]+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 	if [[ ! -z "${VPN_PROTOCOL}" ]]; then
 		echo "[info] VPN_PROTOCOL defined as '${VPN_PROTOCOL}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
-		VPN_PROTOCOL=$(echo "${vpn_remote_line}" | grep -P -o -m 1 'udp|tcp-client|tcp$')
-		export VPN_PROTOCOL=$(echo "${VPN_PROTOCOL}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+		export VPN_PROTOCOL=$(echo "${vpn_remote_line}" | grep -P -o -m 1 'udp|tcp-client|tcp$' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 		if [[ ! -z "${VPN_PROTOCOL}" ]]; then
 			echo "[info] VPN_PROTOCOL defined as '${VPN_PROTOCOL}'" | ts '%Y-%m-%d %H:%M:%.S'
 		else
@@ -242,8 +237,7 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 		export VPN_PROTOCOL="tcp"
 	fi
 
-	VPN_DEVICE_TYPE=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '(?<=^dev\s)[^\r\n]+')
-	export VPN_DEVICE_TYPE=$(echo "${VPN_DEVICE_TYPE}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+	export VPN_DEVICE_TYPE=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '(?<=^dev\s)[^\r\n]+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 	if [[ ! -z "${VPN_DEVICE_TYPE}" ]]; then
 		echo "[info] VPN_DEVICE_TYPE defined as '${VPN_DEVICE_TYPE}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
