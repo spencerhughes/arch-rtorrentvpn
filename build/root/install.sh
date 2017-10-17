@@ -42,10 +42,10 @@ source /root/aor.sh
 ####
 
 # define aur packages
-aur_packages="rutorrent"
+aur_packages="rutorrent autodl-irssi-community"
 
-# call aur install script (arch user repo)
-source /root/aur.sh
+# call aur install script (arch user repo) - note true required due to autodl-irssi error during install
+source /root/aur.sh; true
 
 # call custom install script
 source /root/custom.sh
@@ -73,6 +73,9 @@ sed -i -e "s~.*post_max_size\s\=\s.*~post_max_size = 25M~g" "/etc/php/php.ini"
 
 # configure php with additional php-geoip module
 sed -i -e "/.*extension=gd.so/a extension=geoip.so" "/etc/php/php.ini"
+
+# configure php to enable sockets module (used for autodl-irssi plugin)
+sed -i -e "s~.*extension=sockets.so~extension=sockets.so~g" "/etc/php/php.ini"
 
 # configure php-fpm to use tcp/ip connection for listener
 echo "" >> /etc/php/php-fpm.conf
@@ -105,6 +108,41 @@ sed -i -e "s~\$partitionDirectory \= \&\$topDirectory\;~\$partitionDirectory \= 
 # delete rutorrent tracklabels plugin (causes error messages and crashes rtorrent) and screenshots plugin (not required on headless system)
 rm -rf "/usr/share/webapps/rutorrent/plugins/tracklabels" "/usr/share/webapps/rutorrent/plugins/screenshots"
 
+# config - autodl-irssi
+####
+
+# download autodl-irssi community plugin
+git clone https://github.com/autodl-community/autodl-rutorrent.git /usr/share/webapps/rutorrent/plugins/autodl-irssi
+
+# copy default configuration file 
+cp "/usr/share/webapps/rutorrent/plugins/autodl-irssi/_conf.php" "/usr/share/webapps/rutorrent/plugins/autodl-irssi/conf.php"
+
+# set config for autodl-irssi plugin
+sed -i -e 's~^$autodlPort.*~$autodlPort = 12345;~g' "/usr/share/webapps/rutorrent/plugins/autodl-irssi/conf.php"
+sed -i -e 's~^$autodlPassword.*~$autodlPassword = "autodl-irssi";~g' "/usr/share/webapps/rutorrent/plugins/autodl-irssi/conf.php"
+
+# set config for autodl (must match port and password specified above)
+mkdir -p /home/nobody/.autodl
+cat <<'EOF' > /home/nobody/.autodl/autodl.cfg
+[options]
+gui-server-port = 12345
+gui-server-password = autodl-irssi
+EOF
+
+# add in option to enable/disable autodl-irssi plugin depending on env var 
+# ENABLE_AUTODL_IRSSI value whic is set when /home/nobody/irssi.sh runs
+cat <<'EOF' > "/etc/webapps/rutorrent/conf/plugins.ini"
+
+[autodl-irssi]
+enabled = no
+EOF
+
+# create symlink to autodl script so it auto runs when irssi (irc chat client) starts 
+mkdir -p /home/nobody/.irssi/scripts/autorun
+cd /home/nobody/.irssi/scripts/autorun
+ln -s /usr/share/autodl-irssi/autodl-irssi.pl .
+ln -s /usr/share/autodl-irssi/AutodlIrssi/ .
+
 # config - flood
 ####
 
@@ -130,8 +168,8 @@ sed -i "s~floodServerHost.*~floodServerHost: '0.0.0.0',~g" /etc/webapps/flood/co
 # create file with contets of here doc
  cat <<'EOF' > /tmp/permissions_heredoc
 # set permissions inside container
-chown -R "${PUID}":"${PGID}" /etc/webapps/ /usr/share/webapps/ /usr/share/nginx/html/ /etc/nginx/ /etc/php/ /run/php-fpm/ /var/lib/nginx/ /var/log/nginx/ /etc/privoxy/ /home/nobody/ /etc/webapps/flood
-chmod -R 775 /etc/webapps/ /usr/share/webapps/ /usr/share/nginx/html/ /etc/nginx/ /etc/php/ /run/php-fpm/ /var/lib/nginx/ /var/log/nginx/ /etc/privoxy/ /home/nobody/ /etc/webapps/flood
+chown -R "${PUID}":"${PGID}" /etc/webapps/ /usr/share/webapps/ /usr/share/nginx/html/ /etc/nginx/ /etc/php/ /run/php-fpm/ /var/lib/nginx/ /var/log/nginx/ /etc/privoxy/ /home/nobody/ /etc/webapps/flood /usr/share/autodl-irssi
+chmod -R 775 /etc/webapps/ /usr/share/webapps/ /usr/share/nginx/html/ /etc/nginx/ /etc/php/ /run/php-fpm/ /var/lib/nginx/ /var/log/nginx/ /etc/privoxy/ /home/nobody/ /etc/webapps/flood /usr/share/autodl-irssi
 
 # set shell for user nobody
 chsh -s /bin/bash nobody
@@ -283,14 +321,6 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 		fi
 	fi
 
-	export VPN_INCOMING_PORT=$(echo "${VPN_INCOMING_PORT}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-	if [[ ! -z "${VPN_INCOMING_PORT}" ]]; then
-		echo "[info] VPN_INCOMING_PORT defined as '${VPN_INCOMING_PORT}'" | ts '%Y-%m-%d %H:%M:%.S'
-	else
-		echo "[warn] VPN_INCOMING_PORT not defined (via -e VPN_INCOMING_PORT), downloads may be slow" | ts '%Y-%m-%d %H:%M:%.S'
-		export VPN_INCOMING_PORT=""
-	fi
-
 	export VPN_OPTIONS=$(echo "${VPN_OPTIONS}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 	if [[ ! -z "${VPN_OPTIONS}" ]]; then
 		echo "[info] VPN_OPTIONS defined as '${VPN_OPTIONS}'" | ts '%Y-%m-%d %H:%M:%.S'
@@ -319,16 +349,24 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 		export ENABLE_PRIVOXY="no"
 	fi
 
-	export ENABLE_FLOOD=$(echo "${ENABLE_FLOOD}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-	if [[ ! -z "${ENABLE_FLOOD}" ]]; then
-		echo "[info] ENABLE_FLOOD defined as '${ENABLE_FLOOD}'" | ts '%Y-%m-%d %H:%M:%.S'
-	else
-		echo "[warn] ENABLE_FLOOD not defined (via -e ENABLE_FLOOD), defaulting to 'no'" | ts '%Y-%m-%d %H:%M:%.S'
-		export ENABLE_FLOOD="no"
-	fi
-	
 elif [[ $VPN_ENABLED == "no" ]]; then
 	echo "[warn] !!IMPORTANT!! You have set the VPN to disabled, you will NOT be secure!" | ts '%Y-%m-%d %H:%M:%.S'
+fi
+
+export ENABLE_FLOOD=$(echo "${ENABLE_FLOOD}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+if [[ ! -z "${ENABLE_FLOOD}" ]]; then
+	echo "[info] ENABLE_FLOOD defined as '${ENABLE_FLOOD}'" | ts '%Y-%m-%d %H:%M:%.S'
+else
+	echo "[warn] ENABLE_FLOOD not defined (via -e ENABLE_FLOOD), defaulting to 'no'" | ts '%Y-%m-%d %H:%M:%.S'
+	export ENABLE_FLOOD="no"
+fi
+
+export ENABLE_AUTODL_IRSSI=$(echo "${ENABLE_AUTODL_IRSSI}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+if [[ ! -z "${ENABLE_AUTODL-IRSSI}" ]]; then
+	echo "[info] ENABLE_AUTODL_IRSSI defined as '${ENABLE_AUTODL_IRSSI}'" | ts '%Y-%m-%d %H:%M:%.S'
+else
+	echo "[warn] ENABLE_AUTODL_IRSSI not defined (via -e ENABLE_AUTODL_IRSSI), defaulting to 'no'" | ts '%Y-%m-%d %H:%M:%.S'
+	export ENABLE_AUTODL_IRSSI="no"
 fi
 
 EOF
