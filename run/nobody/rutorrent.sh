@@ -142,22 +142,18 @@ else
 	# create soft link to rutorrent share folder
 	ln -fs /config/rutorrent/share /usr/share/webapps/rutorrent
 
-	# if plugins folder exists in container then rename
-	if [ -d "/usr/share/webapps/rutorrent/plugins" ]; then
-		mv /usr/share/webapps/rutorrent/plugins /usr/share/webapps/rutorrent/plugins-backup 2>/dev/null || true
+	# if defunct plugins-backup folder exists in container then rename back to plugins (for existing users)
+	# this change is due to corruption of plugins and updates to plugins causing incompatibility
+	if [ -d "/usr/share/webapps/rutorrent/plugins-backup" ]; then
+		rm -rf /usr/share/webapps/rutorrent/plugins 2>/dev/null || true
+		mv /usr/share/webapps/rutorrent/plugins-backup /usr/share/webapps/rutorrent/plugins 2>/dev/null || true
 	fi
 
-	# if plugins folder doesnt exist on /config then copy default set from container
-	if [ ! -d "/config/rutorrent/plugins" ]; then
-		echo "[info] rutorrent plugins folder doesnt exist, copying plugins from container..."
-		mkdir -p /config/rutorrent/plugins
-		rsync -a /usr/share/webapps/rutorrent/plugins-backup/ /config/rutorrent/plugins/ 2>/dev/null || true
+	# if defunct plugins host volume map folder exists then remove (for existing users)
+	# this change is due to corruption of plugins and updates to plugins causing incompatibility
+	if [ -d "/config/rutorrent/plugins" ]; then
+		rm -rf /config/rutorrent/plugins 2>/dev/null || true
 	fi
-
-	# rsync plugins from /config to container to capture user installed plugins and/or deletions (cannot soft link thus copy back)
-	echo "[info] copying rutorrent plugins to container..."
-	mkdir -p /usr/share/webapps/rutorrent/plugins
-	rsync --delete -a /config/rutorrent/plugins/ /usr/share/webapps/rutorrent/plugins/ 2>/dev/null || true
 
 	echo "[info] starting php-fpm..."
 
