@@ -101,6 +101,23 @@ else
 	# create soft link to rutorrent conf folder
 	ln -fs /config/rutorrent/conf /etc/webapps/rutorrent
 
+	# copy plugins.ini from container to host volume map required for users
+	# with existing plugins.ini, new users will not need this, please remove
+	cp -f /etc/webapps/rutorrent/conf-backup/plugins.ini /config/rutorrent/conf/plugins.ini
+
+	# if autodl-irssi enabled then toggle switch
+	if [[ "${ENABLE_AUTODL_IRSSI}" == "yes" ]]; then
+
+		# enable autodl-plugin
+		sed -i -r '/^\[autodl-irssi\]/!b;n;cenabled = yes' /config/rutorrent/conf/plugins.ini
+
+	else
+
+		# disable autodl-plugin
+		sed -i -r '/^\[autodl-irssi\]/!b;n;cenabled = no' /config/rutorrent/conf/plugins.ini
+
+	fi
+
 	# if share folder exists in container then rename
 	if [[ -d "/usr/share/webapps/rutorrent/share" && ! -L "/usr/share/webapps/rutorrent/share" ]]; then
 		mv /usr/share/webapps/rutorrent/share /usr/share/webapps/rutorrent/share-backup 2>/dev/null || true

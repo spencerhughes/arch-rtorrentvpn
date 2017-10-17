@@ -8,9 +8,6 @@ if [[ "${ENABLE_AUTODL_IRSSI}" == "yes" ]]; then
 		source /home/nobody/getvpnip.sh
 	fi
 
-	# enable autodl-plugin
-	sed -i -r '/^\[autodl-irssi\]/!b;n;cenabled = yes' /config/rutorrent/conf/plugins.ini
-
 	# change directory to script location and then run irssi via tmux
 	cd /home/nobody/.irssi/scripts/autorun
 
@@ -23,9 +20,6 @@ if [[ "${ENABLE_AUTODL_IRSSI}" == "yes" ]]; then
 	tmux send-keys -t irssi_session:0 "/autodl update" ENTER
 
 else
-
-	# disable autodl-plugin
-	sed -i -r '/^\[autodl-irssi\]/!b;n;cenabled = no' /config/rutorrent/conf/plugins.ini
 
 	echo "[info] Autodl-irssi not enabled, skipping startup"
 

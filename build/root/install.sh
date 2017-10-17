@@ -131,7 +131,7 @@ EOF
 
 # add in option to enable/disable autodl-irssi plugin depending on env var 
 # ENABLE_AUTODL_IRSSI value whic is set when /home/nobody/irssi.sh runs
-cat <<'EOF' > "/etc/webapps/rutorrent/conf/plugins.ini"
+cat <<'EOF' >> "/etc/webapps/rutorrent/conf/plugins.ini"
 
 [autodl-irssi]
 enabled = no
