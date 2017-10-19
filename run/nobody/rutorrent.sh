@@ -118,6 +118,13 @@ else
 
 	fi
 
+	# create folder for rutorrent user plugins
+	mkdir -p /config/rutorrent/user-plugins/theme/themes
+	echo "Please place additional ruTorrent Plugins in this folder, and then restart the container for the change to take affect" > /config/rutorrent/user-plugins/README.txt
+	echo "Please place additional ruTorrent Themes in this folder, and then restart the container for the change to take affect" > /config/rutorrent/user-plugins/theme/themes/README.txt
+	echo "[info] running rsync to copy rutorrent user plugins to the plugins folder inside the container..."
+	rsync --verbose --recursive --compress --human-readable --update /config/rutorrent/user-plugins/ /usr/share/webapps/rutorrent/plugins/
+
 	# if share folder exists in container then rename
 	if [[ -d "/usr/share/webapps/rutorrent/share" && ! -L "/usr/share/webapps/rutorrent/share" ]]; then
 		mv /usr/share/webapps/rutorrent/share /usr/share/webapps/rutorrent/share-backup 2>/dev/null || true
