@@ -106,7 +106,7 @@ sed -i -e "s~\$updateInterval \= 60\;~\$updateInterval \= 10\;~g" "/usr/share/we
 sed -i -e "s~\$partitionDirectory \= \&\$topDirectory\;~\$partitionDirectory \= \"/data\";~g" "/usr/share/webapps/rutorrent/plugins/diskspace/conf.php"
 
 # delete rutorrent tracklabels plugin (causes error messages and crashes rtorrent) and screenshots plugin (not required on headless system)
-rm -rf "/usr/share/webapps/rutorrent/plugins/tracklabels" "/usr/share/webapps/rutorrent/plugins/screenshots"
+rm -rf "/usr/share/webapps/rutorrent/plugins/screenshots"
 
 # config - autodl-irssi
 ####
@@ -121,7 +121,7 @@ cp "/usr/share/webapps/rutorrent/plugins/autodl-irssi/_conf.php" "/usr/share/web
 sed -i -e 's~^$autodlPort.*~$autodlPort = 12345;~g' "/usr/share/webapps/rutorrent/plugins/autodl-irssi/conf.php"
 sed -i -e 's~^$autodlPassword.*~$autodlPassword = "autodl-irssi";~g' "/usr/share/webapps/rutorrent/plugins/autodl-irssi/conf.php"
 
-# set config for autodl (must match port and password specified above)
+# set config for autodl (must match port and password specified in /usr/share/webapps/rutorrent/plugins/autodl-irssi/conf.php)
 mkdir -p /home/nobody/.autodl
 cat <<'EOF' > /home/nobody/.autodl/autodl.cfg
 [options]
@@ -130,7 +130,7 @@ gui-server-password = autodl-irssi
 EOF
 
 # add in option to enable/disable autodl-irssi plugin depending on env var 
-# ENABLE_AUTODL_IRSSI value whic is set when /home/nobody/irssi.sh runs
+# ENABLE_AUTODL_IRSSI value which is set when /home/nobody/irssi.sh runs
 cat <<'EOF' >> "/etc/webapps/rutorrent/conf/plugins.ini"
 
 [autodl-irssi]
