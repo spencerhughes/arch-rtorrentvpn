@@ -2,6 +2,7 @@
 
 [rTorrent](https://github.com/rakshasa/rtorrent)
 [ruTorrent](https://github.com/Novik/ruTorrent)
+[autodl-irssi](https://github.com/autodl-community/autodl-irssi)
 [Flood](https://github.com/jfurrow/flood)
 [OpenVPN](https://openvpn.net/)
 [Privoxy](http://www.privoxy.org/)
