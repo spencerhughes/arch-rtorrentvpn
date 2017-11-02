@@ -124,9 +124,10 @@ EOF
 
 # create symlink to autodl script so it auto runs when irssi (irc chat client) starts 
 mkdir -p /home/nobody/.irssi/scripts/autorun
+cd /home/nobody/.irssi/scripts
+ln -s /usr/share/autodl-irssi/AutodlIrssi/ .
 cd /home/nobody/.irssi/scripts/autorun
 ln -s /usr/share/autodl-irssi/autodl-irssi.pl .
-ln -s /usr/share/autodl-irssi/AutodlIrssi/ .
 
 # config - flood
 ####
