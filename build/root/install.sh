@@ -30,10 +30,25 @@ source /root/aor.sh
 aur_packages="rutorrent autodl-irssi-community"
 
 # call aur install script (arch user repo) - note true required due to autodl-irssi error during install
-source /root/aur.sh; true
+source /root/aur.sh
 
-# call custom install script
-source /root/custom.sh
+# github releases
+####
+
+# download flood ui for rtorrent
+/root/github.sh -df github-download.zip -dp /tmp -ep /tmp/extracted -ip /etc/webapps/flood -go jfurrow -gr flood
+
+# install flood
+cd /etc/webapps/flood && npm install --production
+
+# download autodl-irssi community plugin
+/root/github.sh -df github-download.zip -dp /tmp -ep /tmp/extracted -ip /usr/share/webapps/rutorrent/plugins/autodl-irssi -go autodl-community -gr autodl-rutorrent
+
+# download htpasswd (problems with apache-tools and openssl 1.1.x)
+/root/curly.sh -rc 6 -rw 10 -of /tmp/htpasswd.tar.gz -url "https://github.com/binhex/arch-packages/raw/master/compiled/htpasswd.tar.gz"
+
+# extract compiled version of htpasswd
+tar -xvf /tmp/htpasswd.tar.gz -C /
 
 # config - php
 ####
@@ -95,9 +110,6 @@ rm -rf "/usr/share/webapps/rutorrent/plugins/screenshots"
 
 # config - autodl-irssi
 ####
-
-# download autodl-irssi community plugin
-git clone https://github.com/autodl-community/autodl-rutorrent.git /usr/share/webapps/rutorrent/plugins/autodl-irssi
 
 # copy default configuration file 
 cp "/usr/share/webapps/rutorrent/plugins/autodl-irssi/_conf.php" "/usr/share/webapps/rutorrent/plugins/autodl-irssi/conf.php"
