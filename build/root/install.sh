@@ -36,13 +36,13 @@ source /root/aur.sh
 ####
 
 # download flood ui for rtorrent
-/root/github.sh -df github-download.zip -dp /tmp -ep /tmp/extracted -ip /etc/webapps/flood -go jfurrow -gr flood
+/root/github.sh -df "github-download.zip" -dp "/tmp" -ep "/tmp/extracted" -ip "/etc/webapps/flood" -go "jfurrow" -gr "flood" -rt "source"
 
 # install flood
 cd /etc/webapps/flood && npm install --production
 
 # download autodl-irssi community plugin
-/root/github.sh -df github-download.zip -dp /tmp -ep /tmp/extracted -ip /usr/share/webapps/rutorrent/plugins/autodl-irssi -go autodl-community -gr autodl-rutorrent
+/root/github.sh -df "github-download.zip" -dp "/tmp" -ep "/tmp/extracted" -ip "/usr/share/webapps/rutorrent/plugins/autodl-irssi" -go "autodl-community" -gr "autodl-rutorrent" -rt "source"
 
 # download htpasswd (problems with apache-tools and openssl 1.1.x)
 /root/curly.sh -rc 6 -rw 10 -of /tmp/htpasswd.tar.gz -url "https://github.com/binhex/arch-packages/raw/master/compiled/htpasswd.tar.gz"
