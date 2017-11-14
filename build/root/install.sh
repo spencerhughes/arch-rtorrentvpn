@@ -120,7 +120,7 @@ sed -i -e 's~^$autodlPassword.*~$autodlPassword = "autodl-irssi";~g' "/usr/share
 
 # set config for autodl (must match port and password specified in /usr/share/webapps/rutorrent/plugins/autodl-irssi/conf.php)
 mkdir -p /home/nobody/.autodl
-cat <<'EOF' > /home/nobody/.autodl/autodl.cfg
+cat <<'EOF' > /home/nobody/.autodl/autodl.cfg.bak
 [options]
 gui-server-port = 12345
 gui-server-password = autodl-irssi
