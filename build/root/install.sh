@@ -111,7 +111,7 @@ rm -rf "/usr/share/webapps/rutorrent/plugins/screenshots"
 # config - autodl-irssi
 ####
 
-# copy default configuration file 
+# copy default configuration file
 cp "/usr/share/webapps/rutorrent/plugins/autodl-irssi/_conf.php" "/usr/share/webapps/rutorrent/plugins/autodl-irssi/conf.php"
 
 # set config for autodl-irssi plugin
@@ -126,7 +126,7 @@ gui-server-port = 12345
 gui-server-password = autodl-irssi
 EOF
 
-# add in option to enable/disable autodl-irssi plugin depending on env var 
+# add in option to enable/disable autodl-irssi plugin depending on env var
 # ENABLE_AUTODL_IRSSI value which is set when /home/nobody/irssi.sh runs
 cat <<'EOF' >> "/etc/webapps/rutorrent/conf/plugins.ini"
 
@@ -134,7 +134,7 @@ cat <<'EOF' >> "/etc/webapps/rutorrent/conf/plugins.ini"
 enabled = no
 EOF
 
-# create symlink to autodl script so it auto runs when irssi (irc chat client) starts 
+# create symlink to autodl script so it auto runs when irssi (irc chat client) starts
 mkdir -p /home/nobody/.irssi/scripts/autorun
 cd /home/nobody/.irssi/scripts
 ln -s /usr/share/autodl-irssi/AutodlIrssi/ .
@@ -273,7 +273,7 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 		export VPN_PROTOCOL="tcp"
 	fi
 
-	export VPN_DEVICE_TYPE=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '(?<=^dev\s)[^\r\n]+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+	export VPN_DEVICE_TYPE=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '(?<=^dev\s)[^\r\n\d]+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 	if [[ ! -z "${VPN_DEVICE_TYPE}" ]]; then
 		echo "[info] VPN_DEVICE_TYPE defined as '${VPN_DEVICE_TYPE}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
