@@ -96,7 +96,7 @@ iptables -P INPUT DROP
 ip6tables -P INPUT DROP 1>&- 2>&-
 
 # accept input to tunnel adapter
-iptables -A INPUT -i "${VPN_DEVICE_TYPE}"0 -j ACCEPT
+iptables -A INPUT -i "${VPN_DEVICE_TYPE}" -j ACCEPT
 
 # accept input to/from docker containers (172.x range is internal dhcp)
 iptables -A INPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j ACCEPT
@@ -150,7 +150,7 @@ iptables -P OUTPUT DROP
 ip6tables -P OUTPUT DROP 1>&- 2>&-
 
 # accept output from tunnel adapter
-iptables -A OUTPUT -o "${VPN_DEVICE_TYPE}"0 -j ACCEPT
+iptables -A OUTPUT -o "${VPN_DEVICE_TYPE}" -j ACCEPT
 
 # accept output to/from docker containers (172.x range is internal dhcp)
 iptables -A OUTPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j ACCEPT
@@ -164,7 +164,7 @@ if [[ $iptable_mangle_exit_code == 0 ]]; then
 	# accept output from rutorrent port 9080 - used for external access
 	iptables -t mangle -A OUTPUT -p tcp --dport 9080 -j MARK --set-mark 1
 	iptables -t mangle -A OUTPUT -p tcp --sport 9080 -j MARK --set-mark 1
-	
+
 	# accept output from rutorrent port 9443 - used for external access
 	iptables -t mangle -A OUTPUT -p tcp --dport 9443 -j MARK --set-mark 2
 	iptables -t mangle -A OUTPUT -p tcp --sport 9443 -j MARK --set-mark 2
