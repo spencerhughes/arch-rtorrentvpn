@@ -49,7 +49,7 @@ docker run -d \
     -e PGID=<gid for user> \
     binhex/arch-rtorrentvpn
 ```
-
+&nbsp;
 Please replace all user variables in the above command defined by <> with the correct values.
 
 **Access ruTorrent (web ui)**
@@ -106,7 +106,7 @@ docker run -d \
     -e PGID=0 \
     binhex/arch-rtorrentvpn
 ```
-
+&nbsp;
 **AirVPN provider**
 
 AirVPN users will need to generate a unique OpenVPN configuration file by using the following link https://airvpn.org/generator/
@@ -125,7 +125,7 @@ rTorrent example config
 port_range = 49400-49400
 port_random = no
 ```
-
+&nbsp;
 **AirVPN example**
 ```
 docker run -d \
@@ -152,30 +152,32 @@ docker run -d \
     -e PGID=0 \
     binhex/arch-rtorrentvpn
 ```
-
+&nbsp;
 **Notes**
+
+Please note this Docker image does not include the required OpenVPN configuration file and certificates. These will typically be downloaded from your VPN providers website (look for OpenVPN configuration files), and generally are zipped.
+
+PIA users - The URL to download the OpenVPN configuration files and certs is:-
+
+`https://www.privateinternetaccess.com/openvpn/openvpn.zip`
+
+Once you have downloaded the zip (normally a zip as they contain multiple ovpn files) then extract it to /config/openvpn/ folder (if that folder doesn't exist then start and stop the docker container to force the creation of the folder).
+
+If there are multiple ovpn files then please delete the ones you don't want to use (normally filename follows location of the endpoint) leaving just a single ovpn file and the certificates referenced in the ovpn file (certificates will normally have a crt and/or pem extension).
 
 User ID (PUID) and Group ID (PGID) can be found by issuing the following command for the user you want to run the container as:-
 
-```
-id <username>
-```
+`id <username>`
 
 If you want to create an additional user account for ruTorrent webui then please execute the following on the host:-
 
-```
-docker exec -it <container name> /home/nobody/createuser.sh <username to create>
-```
+`docker exec -it <container name> /home/nobody/createuser.sh <username to create>`
 
 If you want to delete a user account (or change the password for an account) then please execute the following on the host:-
 
-```
-docker exec -it <container name> /home/nobody/deluser.sh <username to delete>
-```
+`docker exec -it <container name> /home/nobody/deluser.sh <username to delete>`
 
 If you do not define the PHP timezone you may see issues with the ruTorrent Scheduler plugin, please make sure you set the PHP timezone by specifying this using the environment variable PHP_TZ. Valid timezone values can be found here, http://php.net/manual/en/timezones.php
-
-The STRICT_PORT_FORWARD environment variable is used to define whether to force connection only to endpoints that support port forwarding when connecting to PIA (does not affect other providers).
 ___
 If you appreciate my work, then please consider buying me a beer  :D
 
