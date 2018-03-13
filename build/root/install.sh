@@ -236,28 +236,26 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 	/usr/bin/dos2unix "${VPN_CONFIG}" 1> /dev/null
 
 	# get first matching 'remote' line in ovpn
-	vpn_remote=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '^remote\s.*')
+	vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '^remote\s.*')
 
-	if [ -n "${vpn_remote}" ]; then
+	if [ -n "${vpn_remote_line}" ]; then
 
 		# remove all remote lines as we cannot cope with multi remote lines
 		sed -i '/^remote\s.*/d' "${VPN_CONFIG}"
 
 		# if remote line contains old format 'tcp' then replace with newer 'tcp-client' format
-		vpn_remote=$(echo "${vpn_remote}" | sed "s/tcp$/tcp-client/g")
+		vpn_remote_line=$(echo "${vpn_remote_line}" | sed "s/tcp$/tcp-client/g")
 
 		# write the single remote line back to the ovpn file on line 1
-		sed -i -e "1i${vpn_remote}" "${VPN_CONFIG}"
+		sed -i -e "1i${vpn_remote_line}" "${VPN_CONFIG}"
 
-	fi
-
-	# parse values from ovpn file
-	export vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '(?<=^remote\s)[^\n\r]+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-	if [[ ! -z "${vpn_remote_line}" ]]; then
 		echo "[info] VPN remote line defined as '${vpn_remote_line}'" | ts '%Y-%m-%d %H:%M:%.S'
+
 	else
+
 		echo "[crit] VPN configuration file ${VPN_CONFIG} does not contain 'remote' line, showing contents of file before exit..." | ts '%Y-%m-%d %H:%M:%.S'
 		cat "${VPN_CONFIG}" && exit 1
+
 	fi
 
 	export VPN_REMOTE=$(echo "${vpn_remote_line}" | grep -P -o -m 1 '^[^\s\r\n]+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
