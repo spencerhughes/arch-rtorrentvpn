@@ -235,6 +235,22 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 	# convert CRLF (windows) to LF (unix) for ovpn
 	/usr/bin/dos2unix "${VPN_CONFIG}" 1> /dev/null
 
+	# get first matching 'remote' line in ovpn
+	vpn_remote=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '^remote\s.*')
+
+	if [ -n "${vpn_remote}" ]; then
+
+		# remove all remote lines as we cannot cope with multi remote lines
+		sed -i '/^remote\s.*/d' "${VPN_CONFIG}"
+
+		# if remote line contains old format 'tcp' then replace with newer 'tcp-client' format
+		vpn_remote=$(echo "${vpn_remote}" | sed "s/tcp$/tcp-client/g")
+
+		# write the single remote line back to the ovpn file on line 1
+		sed -i -e "1i${vpn_remote}" "${VPN_CONFIG}"
+
+	fi
+
 	# parse values from ovpn file
 	export vpn_remote_line=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '(?<=^remote\s)[^\n\r]+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 	if [[ ! -z "${vpn_remote_line}" ]]; then
@@ -258,6 +274,9 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 		echo "[crit] VPN_PORT not found in ${VPN_CONFIG}, exiting..." | ts '%Y-%m-%d %H:%M:%.S' && exit 1
 	fi
 
+	# if 'proto' is old format 'tcp' then forcibly set to newer 'tcp-client' format
+	sed -i "s/^proto\stcp$/proto tcp-client/g" "${VPN_CONFIG}"
+
 	export VPN_PROTOCOL=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '(?<=^proto\s)[^\r\n]+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 	if [[ ! -z "${VPN_PROTOCOL}" ]]; then
 		echo "[info] VPN_PROTOCOL defined as '${VPN_PROTOCOL}'" | ts '%Y-%m-%d %H:%M:%.S'
@@ -269,11 +288,6 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 			echo "[warn] VPN_PROTOCOL not found in ${VPN_CONFIG}, assuming udp" | ts '%Y-%m-%d %H:%M:%.S'
 			export VPN_PROTOCOL="udp"
 		fi
-	fi
-
-	# required for use in iptables
-	if [[ "${VPN_PROTOCOL}" == "tcp-client" ]]; then
-		export VPN_PROTOCOL="tcp"
 	fi
 
 	VPN_DEVICE_TYPE=$(cat "${VPN_CONFIG}" | grep -P -o -m 1 '(?<=^dev\s)[^\r\n\d]+' | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
