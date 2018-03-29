@@ -72,10 +72,10 @@ sed -i -e "s~.*upload_max_filesize\s\=\s.*~upload_max_filesize = 20M~g" "/etc/ph
 sed -i -e "s~.*post_max_size\s\=\s.*~post_max_size = 25M~g" "/etc/php/php.ini"
 
 # configure php with additional php-geoip module
-sed -i -e "/.*extension=gd.so/a extension=geoip.so" "/etc/php/php.ini"
+sed -i -e "/.*extension=gd/a extension=geoip" "/etc/php/php.ini"
 
 # configure php to enable sockets module (used for autodl-irssi plugin)
-sed -i -e "s~.*extension=sockets.so~extension=sockets.so~g" "/etc/php/php.ini"
+sed -i -e "s~.*extension=sockets~extension=sockets~g" "/etc/php/php.ini"
 
 # configure php-fpm to use tcp/ip connection for listener
 echo "" >> /etc/php/php-fpm.conf
@@ -105,7 +105,7 @@ sed -i -e "s~\$updateInterval \= 60\;~\$updateInterval \= 10\;~g" "/usr/share/we
 # set the rutorrent diskspace plugin to point at the /data volume mapping, default is /
 sed -i -e "s~\$partitionDirectory \= \&\$topDirectory\;~\$partitionDirectory \= \"/data\";~g" "/usr/share/webapps/rutorrent/plugins/diskspace/conf.php"
 
-# delete rutorrent tracklabels plugin (causes error messages and crashes rtorrent) and screenshots plugin (not required on headless system)
+# delete rutorrent screenshots plugin (not required on headless system)
 rm -rf "/usr/share/webapps/rutorrent/plugins/screenshots"
 
 # config - autodl-irssi
