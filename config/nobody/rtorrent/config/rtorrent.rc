@@ -43,6 +43,11 @@ directory = /data/incomplete/
 #schedule = untied_directory,5,5,stop_untied=
 #schedule = untied_directory,5,5,remove_untied=
 
+# Run arbitrary user scripts on startup of rtorrent.
+#execute = {/bin/bash,-c,mkdir -p /config/rtorrent/scripts}
+#execute = {/bin/bash,-c,chmod +x /config/rtorrent/scripts/*.sh}
+#execute = {/bin/bash,-c,/config/rtorrent/scripts/*.sh nobody &}
+
 # Close torrents when diskspace is low.
 #schedule = low_diskspace,5,60,close_low_diskspace=100M
 
@@ -106,3 +111,12 @@ system.file_allocate.set = no
 # Port used for scgi connections
 #
 scgi_port = 0.0.0.0:5000
+
+# Initialise ruTorrent plugins (required for rss and scheduler plugins) on startup 
+# (normally triggered by a browser opening the web ui).
+#
+# The command below in practice does NOT always trigger (possible race condition?) and thus
+# the same command has been added to the script /home/nobody/initplugins.sh in order to 
+# attempt to ensure all plugins are initialised.
+#
+execute = {/bin/bash,-c,/usr/bin/sleep 10s && /usr/bin/php /usr/share/webapps/rutorrent/php/initplugins.php admin &}
