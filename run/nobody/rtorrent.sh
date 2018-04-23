@@ -166,14 +166,8 @@ else
 
 				fi
 
-				if [[ "${ENABLE_AUTODL_IRSSI}" == "yes" ]]; then
-
-					echo "[info] Attempting to start IRSSI..."
-					
-					# run tmux attached to irssi (daemonized, non-blocking)
-					/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s irssi_session -n irssi_window /usr/bin/irssi"
-
-				fi
+				# run script to start autodl-irssi (required due to sigterm of tmux server)
+				source /home/nobody/irssi.sh
 
 				# make sure process rtorrent DOES exist before starting rutorrent plugins
 				retry_count=30
