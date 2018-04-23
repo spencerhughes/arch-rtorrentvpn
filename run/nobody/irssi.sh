@@ -13,7 +13,7 @@ if [[ "${ENABLE_AUTODL_IRSSI}" == "yes" ]]; then
 
 	# create tmux session name 'irssi_session' and window name 'irssi_window'
 	# note the window number starts at 0
-	tmux new-session -d -s irssi_session -n irssi_window /usr/bin/irssi
+	/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s irssi_session -n irssi_window /usr/bin/irssi"
 
 	# send command to update trackers using tmux send-keys command sent to
 	# the session name and window number (0 in this case)

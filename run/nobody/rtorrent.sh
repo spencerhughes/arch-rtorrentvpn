@@ -1,5 +1,6 @@
 #!/bin/bash
 
+function kill_rtorrent
 # if rtorrent config file doesnt exist then copy default to host config volume
 if [[ ! -f "/config/rtorrent/config/rtorrent.rc" ]]; then
 
@@ -132,20 +133,23 @@ else
 				# kill rtorrent (required due to the fact rtorrent cannot cope with dynamic changes to port)
 				if [[ "${rtorrent_running}" == "true" ]]; then
 
-					echo "[info] Sending SIGINT to rTorrent due to port/ip change..."
+					# note its not currently possible to change port and/or ip address whilst running, thus the sigterm
+					echo "[info] Sending SIGTERM (-15) to 'tmux: server' (will terminate rtorrent) due to port/ip change..."
 
-					# kill rtorrent process by sending SIGINT (soft shutdown)
-					pkill -INT "rtorrent main"
+					# SIGTERM used here as SIGINT does not kill the process
+					pkill -SIGTERM "tmux\: server"
 
-					# make sure pid for rtorrent DOESNT exist before re-starting
+					# make sure 'rtorrent main' process DOESNT exist before re-starting
 					while pgrep -x "rtorrent main" &> /dev/null
 					do
-						sleep 0.1s
+
+						sleep 0.5s
+
 					done
 
 				fi
 
-				echo "[info] Removing any rtorrent session lock files left over from the previous run..."
+				echo "[info] Removing any rTorrent session lock files left over from the previous run..."
 				rm -f /config/rtorrent/session/*.lock
 
 				echo "[info] Attempting to start rTorrent..."
@@ -159,6 +163,15 @@ else
 
 					# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface
 					/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -o ip=${external_ip}"
+
+				fi
+
+				if [[ "${ENABLE_AUTODL_IRSSI}" == "yes" ]]; then
+
+					echo "[info] Attempting to start IRSSI..."
+					
+					# run tmux attached to irssi (daemonized, non-blocking)
+					/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s irssi_session -n irssi_window /usr/bin/irssi"
 
 				fi
 
