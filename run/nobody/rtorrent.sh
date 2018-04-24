@@ -1,6 +1,5 @@
 #!/bin/bash
 
-function kill_rtorrent
 # if rtorrent config file doesnt exist then copy default to host config volume
 if [[ ! -f "/config/rtorrent/config/rtorrent.rc" ]]; then
 
