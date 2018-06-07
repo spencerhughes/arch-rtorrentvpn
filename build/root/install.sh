@@ -18,7 +18,7 @@ fi
 ####
 
 # define arch official repo (aor) packages
-aor_packages="rtorrent"
+aor_packages="libtorrent rtorrent"
 
 # call aor script (arch official repo)
 source /root/aor.sh
