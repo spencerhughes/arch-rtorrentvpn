@@ -1,7 +1,10 @@
 #!/bin/bash
 
+# define destination file path for rtorrent config file
+rtorrent_config="/config/rtorrent/config/rtorrent.rc"
+
 # if rtorrent config file doesnt exist then copy default to host config volume
-if [[ ! -f "/config/rtorrent/config/rtorrent.rc" ]]; then
+if [[ ! -f "${rtorrent_config}" ]]; then
 
 	echo "[info] rTorrent config file doesnt exist, copying default to /config/rtorrent/config/..."
 
@@ -14,8 +17,13 @@ else
 
 fi
 
+# remove defunct rtorrent config entries (rtorrent v0.9.7 does not allow entries below in rtorrent.rc)
+sed -i '/use_udp_trackers = yes/d' "${rtorrent_config}"
+sed -i '/peer_exchange = yes/d' "${rtorrent_config}"
+sed -i '/system.file_allocate.set = yes/d' "${rtorrent_config}"
+
 # create soft link to rtorrent config file
-ln -fs /config/rtorrent/config/rtorrent.rc ~/.rtorrent.rc
+ln -fs "${rtorrent_config}" ~/.rtorrent.rc
 
 # if vpn set to "no" then don't run openvpn
 if [[ "${VPN_ENABLED}" == "no" ]]; then
