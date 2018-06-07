@@ -17,9 +17,13 @@ else
 
 fi
 
-# remove defunct rtorrent config entries (rtorrent v0.9.7 does not allow entries below in rtorrent.rc)
-sed -i '/use_udp_trackers = yes/d' "${rtorrent_config}"
-sed -i '/peer_exchange = yes/d' "${rtorrent_config}"
+# replace legacy rtorrent 0.9.6 config entries (rtorrent v0.9.7 does not allow entries below in rtorrent.rc)
+sed -i -e 's~use_udp_trackers = yes~trackers.use_udp.set = yes~g' "${rtorrent_config}"
+sed -i -e 's~use_udp_trackers = no~trackers.use_udp.set = no~g' "${rtorrent_config}"
+sed -i -e 's~peer_exchange = yes~protocol.pex.set = yes~g' "${rtorrent_config}"
+sed -i -e 's~peer_exchange = no~protocol.pex.set = no~g' "${rtorrent_config}"
+
+# remove legacy rtorrent 0.9.6 config entries (rtorrent v0.9.7 does not allow entries below in rtorrent.rc)
 sed -i '/system.file_allocate.set = yes/d' "${rtorrent_config}"
 
 # create soft link to rtorrent config file
