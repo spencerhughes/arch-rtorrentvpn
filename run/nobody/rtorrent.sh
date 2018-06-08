@@ -24,7 +24,7 @@ sed -i -e 's~peer_exchange = yes~protocol.pex.set = yes~g' "${rtorrent_config}"
 sed -i -e 's~peer_exchange = no~protocol.pex.set = no~g' "${rtorrent_config}"
 
 # remove legacy rtorrent 0.9.6 config entries (rtorrent v0.9.7 does not allow entries below in rtorrent.rc)
-sed -i '/system.file_allocate.set = yes/d' "${rtorrent_config}"
+sed -i '/system.file_allocate.set/d' "${rtorrent_config}"
 
 # force unix line endings conversion in case user edited rtorrent.rc with notepad
 dos2unix "${rtorrent_config}"
