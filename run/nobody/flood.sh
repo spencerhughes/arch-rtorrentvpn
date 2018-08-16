@@ -3,15 +3,13 @@
 # if flood enabled then run, else log
 if [[ "${ENABLE_FLOOD}" == "yes" || "${ENABLE_FLOOD}" == "both" ]]; then
 
-	echo "[info] Flood enabled, waiting for rTorrent to start..."
+	echo "[info] Flood enabled"
 
-	# wait for rtorrent process to start (listen for port)
-	while [[ $(netstat -lnt | awk '$6 == "LISTEN" && $4 ~ ".5000"') == "" ]]; do
-		sleep 0.1
-	done
+	# run script to start rtorrent, it can also perform shutdown of rtorrent if its already running (required for port/ip change)
+	source /home/nobody/watchdog.sh
 
-	echo "[info] rTorrent started, configuring Flood..."
-
+	echo "[info] Configuring Flood..."
+	
 	# if flood config file doesnt exist then copy from containr to /config, and back again to capture user changes (cannot soft link thus copy back)
 	flood_config_path="/config/flood/config"
 	flood_install_path="/etc/webapps/flood"

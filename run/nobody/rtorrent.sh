@@ -32,59 +32,28 @@ dos2unix "${rtorrent_config}"
 # create soft link to rtorrent config file
 ln -fs "${rtorrent_config}" ~/.rtorrent.rc
 
-# if vpn set to "no" then don't run openvpn
-if [[ "${VPN_ENABLED}" == "no" ]]; then
+# define connection to rtorrent rpc (used to reconfigure rtorrent)
+xmlrpc_connection="localhost:9080"
 
-	echo "[info] VPN not enabled, skipping VPN tunnel local ip/port checks"
+# set default values for port and ip
+rtorrent_port="49160"
+rtorrent_ip="0.0.0.0"
 
-	rtorrent_ip="0.0.0.0"
+# while loop to check ip and port
+while true; do
 
-	echo "[info] Removing any rtorrent session lock files left over from the previous run..."
-	rm -f /config/rtorrent/session/*.lock
-
-	# run rTorrent (non daemonized, blocking)
-	echo "[info] Attempting to start rTorrent..."
-	/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -s rt -n rtorrent /usr/bin/rtorrent -b ${rtorrent_ip} -o ip=${rtorrent_ip}" &>/dev/null
-
-else
-
-	echo "[info] VPN is enabled, checking VPN tunnel local ip is valid"
-
-	# define connection to rtorrent rpc (used to reconfigure rtorrent)
-	xmlrpc_connection="localhost:9080"
-
-	# set triggers to first run
+	# reset triggers to negative values
 	rtorrent_running="false"
 	ip_change="false"
 	port_change="false"
 
-	# set default values for port and ip
-	rtorrent_port="49160"
-	rtorrent_ip="0.0.0.0"
-
-	# while loop to check ip and port
-	while true; do
+	if [[ "${VPN_ENABLED}" == "yes" ]]; then
 
 		# run script to check ip is valid for tunnel device (will block until valid)
 		source /home/nobody/getvpnip.sh
 
 		# if vpn_ip is not blank then run, otherwise log warning
 		if [[ ! -z "${vpn_ip}" ]]; then
-
-			# check if rtorrent is running, if not then skip reconfigure for port/ip
-			if ! pgrep -x "rtorrent main" > /dev/null; then
-
-				echo "[info] rTorrent not running"
-
-				# mark as rtorrent not running
-				rtorrent_running="false"
-
-			else
-
-				# if rtorrent is running, then reconfigure port/ip
-				rtorrent_running="true"
-
-			fi
 
 			# if current bind interface ip is different to tunnel local ip then re-configure rtorrent
 			if [[ "${rtorrent_ip}" != "${vpn_ip}" ]]; then
@@ -95,6 +64,9 @@ else
 				ip_change="true"
 
 			fi
+
+			# set rtorrent ip to current vpn ip (used when checking for changes on next run)
+			rtorrent_ip="${vpn_ip}"
 
 			# run scripts to identify external ip address
 			source /home/nobody/getvpnextip.sh
@@ -113,138 +85,79 @@ else
 					# ignore port change as we cannot detect new port
 					port_change="false"
 
-				else
+				elif [[ "${rtorrent_running}" == "true" ]]; then
 
-					if [[ "${rtorrent_running}" == "true" ]]; then
+					# run netcat to identify if port still open, use exit code
+					nc_exitcode=$(/usr/bin/nc -z -w 3 "${rtorrent_ip}" "${rtorrent_port}")
 
-						# run netcat to identify if port still open, use exit code
-						nc_exitcode=$(/usr/bin/nc -z -w 3 "${rtorrent_ip}" "${rtorrent_port}")
+					if [[ "${nc_exitcode}" -ne 0 ]]; then
 
-						if [[ "${nc_exitcode}" -ne 0 ]]; then
+						echo "[info] rTorrent incoming port closed, marking for reconfigure"
 
-							echo "[info] rTorrent incoming port closed, marking for reconfigure"
+						# mark as reconfigure required due to mismatch
+						port_change="true"
 
-							# mark as reconfigure required due to mismatch
-							port_change="true"
+					elif [[ "${rtorrent_port}" != "${VPN_INCOMING_PORT}" ]]; then
 
-						elif [[ "${rtorrent_port}" != "${VPN_INCOMING_PORT}" ]]; then
+						echo "[info] rTorrent incoming port $rtorrent_port and VPN incoming port ${VPN_INCOMING_PORT} different, marking for reconfigure"
 
-							echo "[info] rTorrent incoming port $rtorrent_port and VPN incoming port ${VPN_INCOMING_PORT} different, marking for reconfigure"
-
-							# mark as reconfigure required due to mismatch
-							port_change="true"
-
-						fi
+						# mark as reconfigure required due to mismatch
+						port_change="true"
 
 					fi
 
-				fi
-
-			fi
-
-			if [[ "${port_change}" == "true" || "${ip_change}" == "true" || "${rtorrent_running}" == "false" ]]; then
-
-				# kill rtorrent (required due to the fact rtorrent cannot cope with dynamic changes to port)
-				if [[ "${rtorrent_running}" == "true" ]]; then
-
-					# note its not currently possible to change port and/or ip address whilst running, thus the sigterm
-					echo "[info] Sending SIGTERM (-15) to 'tmux: server' (will terminate rtorrent) due to port/ip change..."
-
-					# SIGTERM used here as SIGINT does not kill the process
-					pkill -SIGTERM "tmux\: server"
-
-					# make sure 'rtorrent main' process DOESNT exist before re-starting
-					while pgrep -x "rtorrent main" &> /dev/null
-					do
-
-						sleep 0.5s
-
-					done
+					# set rtorrent port to current vpn port (used when checking for changes on next run)
+					rtorrent_port="${VPN_INCOMING_PORT}"
 
 				fi
 
-				echo "[info] Removing any rTorrent session lock files left over from the previous run..."
-				rm -f /config/rtorrent/session/*.lock
-
-				echo "[info] Attempting to start rTorrent..."
-
-				if [[ "${VPN_PROV}" == "pia" || -n "${VPN_INCOMING_PORT}" ]]; then
-
-					# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface and port
-					/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -p ${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT} -o ip=${external_ip} -o dht_port=${VPN_INCOMING_PORT}"
-
-				else
-
-					# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface
-					/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -o ip=${external_ip}"
-
-				fi
-
-				# run script to start autodl-irssi (required due to sigterm of tmux server)
-				source /home/nobody/irssi.sh
-
-				# make sure process rtorrent DOES exist before starting rutorrent plugins
-				retry_count=30
-				while true; do
-
-					if ! pgrep -x "rtorrent main" > /dev/null; then
-
-						retry_count=$((retry_count-1))
-						if [ "${retry_count}" -eq "0" ]; then
-
-							echo "[warn] Wait for rTorrent process to start aborted"
-							break
-
-						else
-
-							if [[ "${DEBUG}" == "true" ]]; then
-								echo "[debug] Waiting for rTorrent process to start..."
-							fi
-
-							sleep 1s
-
-						fi
-
-					else
-
-						echo "[info] rTorrent started"
-
-						# run script to initialise rutorrent plugins
-						source /home/nobody/initplugins.sh
-						break
-
-					fi
-
-				done
-
 			fi
-
-			# set rtorrent ip and port to current vpn ip and port (used when checking for changes on next run)
-			rtorrent_ip="${vpn_ip}"
-			rtorrent_port="${VPN_INCOMING_PORT}"
-
-			# reset triggers to negative values
-			rtorrent_running="false"
-			ip_change="false"
-			port_change="false"
-
-			if [[ "${DEBUG}" == "true" ]]; then
-
-				echo "[debug] VPN incoming port is ${VPN_INCOMING_PORT}"
-				echo "[debug] VPN IP is ${vpn_ip}"
-				echo "[debug] rTorrent incoming port is ${rtorrent_port}"
-				echo "[debug] rTorrent IP is ${rtorrent_ip}"
-
-			fi
-
+		
 		else
 
 			echo "[warn] VPN IP not detected, VPN tunnel maybe down"
 
 		fi
 
-		sleep 30s
+		if [[ "${port_change}" == "true" || "${ip_change}" == "true" || "${rtorrent_running}" == "false" ]]; then
 
-	done
+			# run script to start rtorrent, it can also perform shutdown of rtorrent if its already running (required for port/ip change)
+			source /home/nobody/watchdog.sh
 
-fi
+			# run script to initialise rutorrent plugins
+			source /home/nobody/initplugins.sh
+
+			# run script to start autodl-irssi (required due to sigterm of tmux server)
+			source /home/nobody/irssi.sh
+
+		fi
+
+	else
+	
+		# set default values when vpn not enabled (referenced in sourced script below)
+    	external_ip="0.0.0.0"
+    	vpn_ip="0.0.0.0"
+
+		# run script to start rtorrent, it can also perform shutdown of rtorrent if its already running (required for port/ip change)
+		source /home/nobody/watchdog.sh
+
+	fi
+
+	if [[ "${DEBUG}" == "true" ]]; then
+
+		if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
+
+			echo "[debug] VPN incoming port is ${VPN_INCOMING_PORT}"
+			echo "[debug] rTorrent incoming port is ${rtorrent_port}"
+
+		else
+
+			echo "[debug] VPN IP is ${vpn_ip}"
+			echo "[debug] rTorrent IP is ${rtorrent_ip}"
+
+		fi
+	fi
+
+	sleep 30s
+
+done
