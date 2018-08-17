@@ -135,9 +135,6 @@ while true; do
 				# run script to initialise rutorrent plugins
 				source /home/nobody/initplugins.sh
 
-				# run script to start autodl-irssi (required due to sigterm of tmux server)
-				source /home/nobody/irssi.sh
-
 			fi
 		
 		else
@@ -149,8 +146,8 @@ while true; do
 	else
 	
 		# set default values when vpn not enabled (referenced in sourced script below)
-    	external_ip="0.0.0.0"
-    	vpn_ip="0.0.0.0"
+		external_ip="0.0.0.0"
+		vpn_ip="0.0.0.0"
 
 		# run script to start rtorrent, it can also perform shutdown of rtorrent if its already running (required for port/ip change)
 		source /home/nobody/watchdog.sh
