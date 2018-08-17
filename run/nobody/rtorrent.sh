@@ -132,6 +132,14 @@ while true; do
 				# run script to start rtorrent, it can also perform shutdown of rtorrent if its already running (required for port/ip change)
 				source /home/nobody/watchdog.sh
 
+				# if rtorrent was previously running then we will have to kill and start tmux again (port/ip change), due to tmux being restarted we need to re-start irssi
+				if ! pgrep -x "irssi" > /dev/null; then
+
+					# run script to start autodl-irssi
+					source /home/nobody/irssi.sh
+
+				fi
+
 				# run script to initialise rutorrent plugins
 				source /home/nobody/initplugins.sh
 
