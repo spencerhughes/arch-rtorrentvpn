@@ -72,6 +72,8 @@ while true; do
 
 			else
 
+				echo "[info] rTorrent running"
+
 				# mark as rtorrent as running
 				rtorrent_running="true"
 
@@ -110,6 +112,9 @@ while true; do
 
 							# mark as reconfigure required due to mismatch
 							port_change="true"
+
+						fi
+
 					fi
 
 					if [[ "${rtorrent_port}" != "${VPN_INCOMING_PORT}" ]]; then
