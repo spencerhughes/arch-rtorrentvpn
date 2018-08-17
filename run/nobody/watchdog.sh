@@ -39,6 +39,9 @@ else
 
 fi
 
+# set rtorrent ip to current vpn ip (used when checking for changes on next run)
+rtorrent_ip="${vpn_ip}"
+
 # make sure process rtorrent DOES exist
 retry_count=30
 while true; do

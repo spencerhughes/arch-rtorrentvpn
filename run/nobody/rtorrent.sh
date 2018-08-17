@@ -79,9 +79,6 @@ while true; do
 
 			fi
 
-			# set rtorrent ip to current vpn ip (used when checking for changes on next run)
-			rtorrent_ip="${vpn_ip}"
-
 			# run scripts to identify external ip address
 			source /home/nobody/getvpnextip.sh
 
@@ -167,12 +164,11 @@ while true; do
 			echo "[debug] VPN incoming port is ${VPN_INCOMING_PORT}"
 			echo "[debug] rTorrent incoming port is ${rtorrent_port}"
 
-		else
-
-			echo "[debug] VPN IP is ${vpn_ip}"
-			echo "[debug] rTorrent IP is ${rtorrent_ip}"
-
 		fi
+
+		echo "[debug] VPN IP is ${vpn_ip}"
+		echo "[debug] rTorrent IP is ${rtorrent_ip}"
+
 	fi
 
 	sleep 30s
