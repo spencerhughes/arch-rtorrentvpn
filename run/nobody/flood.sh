@@ -5,8 +5,10 @@ if [[ "${ENABLE_FLOOD}" == "yes" || "${ENABLE_FLOOD}" == "both" ]]; then
 
 	echo "[info] Flood enabled"
 
-	# run script to start rtorrent, it can also perform shutdown of rtorrent if its already running (required for port/ip change)
-	source /home/nobody/watchdog.sh
+	echo "[info] Waiting for rTorrent process to start listening on port 5000..."
+	while [[ $(netstat -lnt | awk '$6 == "LISTEN" && $4 ~ ".5000"') == "" ]]; do
+    	sleep 0.1
+	done
 
 	echo "[info] Configuring Flood..."
 	
