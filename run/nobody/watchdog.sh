@@ -1,20 +1,5 @@
 #!/bin/bash
 
-# check if rtorrent is running, if not then skip shutdown of process
-if ! pgrep -x "rtorrent main" > /dev/null; then
-
-    echo "[info] rTorrent not running"
-
-    # mark as rtorrent not running
-    rtorrent_running="false"
-
-else
-
-    # mark as rtorrent as running
-    rtorrent_running="true"
-
-fi
-
 # kill rtorrent (required due to the fact rtorrent cannot cope with dynamic changes to port)
 if [[ "${rtorrent_running}" == "true" ]]; then
 

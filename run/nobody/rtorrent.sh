@@ -65,6 +65,18 @@ while true; do
 
 			fi
 
+			# check if rtorrent is running, if not then skip shutdown of process
+			if ! pgrep -x "rtorrent main" > /dev/null; then
+
+				echo "[info] rTorrent not running"
+
+			else
+
+				# mark as rtorrent as running
+				rtorrent_running="true"
+
+			fi
+
 			# set rtorrent ip to current vpn ip (used when checking for changes on next run)
 			rtorrent_ip="${vpn_ip}"
 
@@ -112,23 +124,23 @@ while true; do
 				fi
 
 			fi
+
+			if [[ "${port_change}" == "true" || "${ip_change}" == "true" || "${rtorrent_running}" == "false" ]]; then
+
+				# run script to start rtorrent, it can also perform shutdown of rtorrent if its already running (required for port/ip change)
+				source /home/nobody/watchdog.sh
+
+				# run script to initialise rutorrent plugins
+				source /home/nobody/initplugins.sh
+
+				# run script to start autodl-irssi (required due to sigterm of tmux server)
+				source /home/nobody/irssi.sh
+
+			fi
 		
 		else
 
 			echo "[warn] VPN IP not detected, VPN tunnel maybe down"
-
-		fi
-
-		if [[ "${port_change}" == "true" || "${ip_change}" == "true" || "${rtorrent_running}" == "false" ]]; then
-
-			# run script to start rtorrent, it can also perform shutdown of rtorrent if its already running (required for port/ip change)
-			source /home/nobody/watchdog.sh
-
-			# run script to initialise rutorrent plugins
-			source /home/nobody/initplugins.sh
-
-			# run script to start autodl-irssi (required due to sigterm of tmux server)
-			source /home/nobody/irssi.sh
 
 		fi
 
