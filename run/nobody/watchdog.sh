@@ -29,6 +29,9 @@ if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
     # run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface and port
     /usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -p ${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT} -o ip=${external_ip} -o dht_port=${VPN_INCOMING_PORT}"
 
+	# set rtorrent port to current vpn port (used when checking for changes on next run)
+	rtorrent_port="${VPN_INCOMING_PORT}"
+
 else
 
     # run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface

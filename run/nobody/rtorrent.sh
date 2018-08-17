@@ -97,19 +97,22 @@ while true; do
 					# ignore port change as we cannot detect new port
 					port_change="false"
 
-				elif [[ "${rtorrent_running}" == "true" ]]; then
+				else
 
-					# run netcat to identify if port still open, use exit code
-					nc_exitcode=$(/usr/bin/nc -z -w 3 "${rtorrent_ip}" "${rtorrent_port}")
+					if [[ "${rtorrent_running}" == "true" ]]; then
 
-					if [[ "${nc_exitcode}" -ne 0 ]]; then
+						# run netcat to identify if port still open, use exit code
+						nc_exitcode=$(/usr/bin/nc -z -w 3 "${rtorrent_ip}" "${rtorrent_port}")
 
-						echo "[info] rTorrent incoming port closed, marking for reconfigure"
+						if [[ "${nc_exitcode}" -ne 0 ]]; then
 
-						# mark as reconfigure required due to mismatch
-						port_change="true"
+							echo "[info] rTorrent incoming port closed, marking for reconfigure"
 
-					elif [[ "${rtorrent_port}" != "${VPN_INCOMING_PORT}" ]]; then
+							# mark as reconfigure required due to mismatch
+							port_change="true"
+					fi
+
+					if [[ "${rtorrent_port}" != "${VPN_INCOMING_PORT}" ]]; then
 
 						echo "[info] rTorrent incoming port $rtorrent_port and VPN incoming port ${VPN_INCOMING_PORT} different, marking for reconfigure"
 
@@ -117,9 +120,6 @@ while true; do
 						port_change="true"
 
 					fi
-
-					# set rtorrent port to current vpn port (used when checking for changes on next run)
-					rtorrent_port="${VPN_INCOMING_PORT}"
 
 				fi
 
