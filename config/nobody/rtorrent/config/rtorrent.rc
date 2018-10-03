@@ -2,24 +2,42 @@
 # ~/.rtorrent.rc and enable/modify the options as needed. Remember to
 # uncomment the options you wish to enable.
 
+# Maximum number of simultaneous downloads and uploads slots (global slots!) (`max_downloads_global`, `max_uploads_global`)
+#
+#throttle.max_downloads.global.set = 300
+#throttle.max_uploads.global.set   = 300
+
+# Global upload and download rate in KiB. "0" for unlimited.
+#
+#throttle.global_down.max_rate.set_kb = 0
+#throttle.global_up.max_rate.set_kb = 0
+
+# Maximum number of simultaneous downloads and uploads slots per torrent (`max_uploads`) Default: `50` for both
+#
+#throttle.max_downloads.set = 50
+#throttle.max_uploads.set = 8
+
 # Maximum and minimum number of peers to connect to per torrent.
 #
-#throttle.min_peers.normal.set = 40
-#throttle.max_peers.normal.set = 100
+#throttle.min_peers.normal.set = 100
+#throttle.max_peers.normal.set = 200
 
 # Same as above but for seeding completed torrents (-1 = same as downloading)
 #
 #throttle.min_peers.seed.set = 10
 #throttle.max_peers.seed.set = 50
 
+# Maximum number of connections rtorrent can accept/make (`sockets`)
+#
+#network.max_open_sockets.set = 1200
+
+# Maximum number of open files rtorrent can keep open (you have to modify the system wide settings with ulimit!) (`set_max_open_files`)
+#
+#network.max_open_files.set = 600
+
 # Maximum number of simultanious uploads per torrent.
 #
 #throttle.max_uploads.set = 15
-
-# Global upload and download rate in KiB. "0" for unlimited.
-#
-#throttle.global_down.max_rate.set_kb = 0
-#throttle.global_up.max_rate.set_kb = 0
 
 # Default directory to save the downloaded torrents.
 #

@@ -7,7 +7,7 @@ set -e
 ####
 
 # define pacman packages
-pacman_packages="git nginx php-fpm rsync openssl tmux gnu-netcat mediainfo npm nodejs php-geoip ipcalc unrar"
+pacman_packages="git nginx php-fpm rsync openssl tmux gnu-netcat mediainfo npm nodejs php-geoip ipcalc unrar libx264 libvpx"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
@@ -27,7 +27,7 @@ source /root/aor.sh
 ####
 
 # define aur packages
-aur_packages="rutorrent autodl-irssi-community"
+aur_packages="ffmpeg-headless rutorrent autodl-irssi-community"
 
 # call aur install script (arch user repo) - note true required due to autodl-irssi error during install
 source /root/aur.sh
@@ -104,9 +104,6 @@ sed -i -e "s~\$updateInterval \= 60\;~\$updateInterval \= 10\;~g" "/usr/share/we
 
 # set the rutorrent diskspace plugin to point at the /data volume mapping, default is /
 sed -i -e "s~\$partitionDirectory \= \&\$topDirectory\;~\$partitionDirectory \= \"/data\";~g" "/usr/share/webapps/rutorrent/plugins/diskspace/conf.php"
-
-# delete rutorrent screenshots plugin (not required on headless system)
-rm -rf "/usr/share/webapps/rutorrent/plugins/screenshots"
 
 # config - autodl-irssi
 ####
