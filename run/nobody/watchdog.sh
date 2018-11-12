@@ -58,7 +58,7 @@ while true; do
 			# if current bind interface ip is different to tunnel local ip then re-configure rtorrent
 			if [[ "${rtorrent_ip}" != "${vpn_ip}" ]]; then
 
-				echo "[info] rTorrent listening interface IP $rtorrent_ip and VPN provider IP ${vpn_ip} different, marking for reconfigure"
+				echo "[info] rTorrent listening interface IP ${rtorrent_ip} and VPN provider IP ${vpn_ip} different, marking for reconfigure"
 
 				# mark as reload required due to mismatch
 				ip_change="true"
@@ -101,7 +101,7 @@ while true; do
 					if [[ "${rtorrent_running}" == "true" ]]; then
 
 						# run netcat to identify if port still open, use exit code
-						nc_exitcode=$(/usr/bin/nc -z -w 3 "${rtorrent_ip}" "${rtorrent_port}")
+						nc_exitcode=$(/usr/bin/nc -z -w 3 "${vpn_ip}" "${rtorrent_port}")
 
 						if [[ "${nc_exitcode}" -ne 0 ]]; then
 
