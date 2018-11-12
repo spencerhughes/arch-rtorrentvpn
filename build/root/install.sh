@@ -34,7 +34,7 @@ source /root/aor.sh
 ####
 
 # define aur packages
-aur_packages="ffmpeg-headless rutorrent autodl-irssi-community"
+aur_packages="rutorrent autodl-irssi-community"
 
 # call aur install script (arch user repo) - note true required due to autodl-irssi error during install
 source /root/aur.sh
