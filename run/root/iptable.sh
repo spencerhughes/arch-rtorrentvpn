@@ -30,7 +30,7 @@ echo "[info] Docker network defined as ${docker_network_cidr}"
 # ip route
 ###
 
-# split comma seperated string into list from LAN_NETWORK env variable
+# split comma separated string into list from LAN_NETWORK env variable
 IFS=',' read -ra lan_network_list <<< "${LAN_NETWORK}"
 
 # process lan networks in the list
