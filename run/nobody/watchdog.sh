@@ -72,8 +72,6 @@ while true; do
 
 			else
 
-				echo "[info] rTorrent running"
-
 				# mark as rtorrent as running
 				rtorrent_running="true"
 
