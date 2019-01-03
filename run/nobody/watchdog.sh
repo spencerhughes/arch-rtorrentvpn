@@ -188,6 +188,9 @@ while true; do
 
 	fi
 
+	# run script to rotate nginx log files
+	source /home/nobody/logrotate.sh
+
 	sleep 30s
 
 done
