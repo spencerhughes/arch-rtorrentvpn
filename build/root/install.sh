@@ -10,11 +10,26 @@ echo 'Server = http://archlinux.mirrors.uk2.net/$repo/os/$arch' >> /etc/pacman.d
 # sync package databases for pacman
 pacman -Syyu --noconfirm
 
+# build scripts
+####
+
+# download build scripts from github
+curl --connect-timeout 5 --max-time 600 --retry 5 --retry-delay 0 --retry-max-time 60 -o /tmp/scripts-master.zip -L https://github.com/binhex/scripts/archive/master.zip
+
+# unzip build scripts
+unzip /tmp/scripts-master.zip -d /tmp
+
+# move shell scripts to /root
+mv /tmp/scripts-master/shell/arch/docker/*.sh /root/
+
 # pacman packages
 ####
 
+# flood currently requires nodejs v10 (package name nodejs-lts-dubnium), not v11 (package name nodejs) thus we force install of v10 before we proceed to install npm (dependency nodejs)
+pacman -S nodejs-lts-dubnium --needed --noconfirm
+
 # define pacman packages
-pacman_packages="git nginx php-fpm rsync openssl tmux gnu-netcat mediainfo npm nodejs php-geoip ipcalc unrar unzip libx264 libvpx libtorrent rtorrent"
+pacman_packages="git nginx php-fpm rsync openssl tmux gnu-netcat mediainfo npm php-geoip ipcalc unrar unzip libx264 libvpx libtorrent rtorrent"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
@@ -43,10 +58,16 @@ source /root/aur.sh
 ####
 
 # download flood ui for rtorrent
-/root/github.sh -df "github-download.zip" -dp "/tmp" -ep "/tmp/extracted" -ip "/etc/webapps/flood" -go "jfurrow" -gr "flood" -rt "source"
+/root/github.sh -df "github-download.zip" -dp "/tmp" -ep "/tmp/extracted" -ip "/etc/webapps/flood" -go "jfurrow" -gr "flood" -rt "source" -db "master"
+
+# flood requires make for npm packages
+pacman -S base-devel --needed --noconfirm
 
 # install flood
 cd /etc/webapps/flood && npm install --production
+
+# after flood install remove base devel excluding useful core packages
+pacman -Ru $(pacman -Qgq base-devel | grep -v awk | grep -v pacman | grep -v sed | grep -v grep | grep -v gzip | grep -v which) --noconfirm
 
 # download autodl-irssi community plugin
 /root/github.sh -df "github-download.zip" -dp "/tmp" -ep "/tmp/extracted" -ip "/usr/share/webapps/rutorrent/plugins/autodl-irssi" -go "autodl-community" -gr "autodl-rutorrent" -rt "source"
