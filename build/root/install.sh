@@ -63,8 +63,8 @@ source /root/aur.sh
 # flood requires make for npm packages
 pacman -S base-devel --needed --noconfirm
 
-# install flood
-cd /etc/webapps/flood && npm install --production
+# install flood - note do not attempt to run 'npm run build' as we currently cannot do this during docker build time
+cd /etc/webapps/flood && npm install
 
 # after flood install remove base devel excluding useful core packages
 pacman -Ru $(pacman -Qgq base-devel | grep -v awk | grep -v pacman | grep -v sed | grep -v grep | grep -v gzip | grep -v which) --noconfirm
@@ -255,7 +255,14 @@ fi
 
 export VPN_ENABLED=$(echo "${VPN_ENABLED}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 if [[ ! -z "${VPN_ENABLED}" ]]; then
-	echo "[info] VPN_ENABLED defined as '${VPN_ENABLED}'" | ts '%Y-%m-%d %H:%M:%.S'
+	if [ "${VPN_ENABLED}" != "no" ] && [ "${VPN_ENABLED}" != "No" ] && [ "${VPN_ENABLED}" != "NO" ]; then
+		export VPN_ENABLED="yes"
+		echo "[info] VPN_ENABLED defined as '${VPN_ENABLED}'" | ts '%Y-%m-%d %H:%M:%.S'
+	else
+		export VPN_ENABLED="no"
+		echo "[info] VPN_ENABLED defined as '${VPN_ENABLED}'" | ts '%Y-%m-%d %H:%M:%.S'
+		echo "[warn] !!IMPORTANT!! VPN IS SET TO DISABLED', YOU WILL NOT BE SECURE" | ts '%Y-%m-%d %H:%M:%.S'
+	fi
 else
 	echo "[warn] VPN_ENABLED not defined,(via -e VPN_ENABLED), defaulting to 'yes'" | ts '%Y-%m-%d %H:%M:%.S'
 	export VPN_ENABLED="yes"
@@ -425,8 +432,6 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 		export ENABLE_PRIVOXY="no"
 	fi
 
-elif [[ $VPN_ENABLED == "no" ]]; then
-	echo "[warn] !!IMPORTANT!! You have set the VPN to disabled, you will NOT be secure!" | ts '%Y-%m-%d %H:%M:%.S'
 fi
 
 export ENABLE_FLOOD=$(echo "${ENABLE_FLOOD}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
