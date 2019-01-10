@@ -7,12 +7,12 @@ if [[ "${ENABLE_FLOOD}" == "yes" || "${ENABLE_FLOOD}" == "both" ]]; then
 
 	echo "[info] Waiting for rTorrent process to start listening on port 5000..."
 	while [[ $(netstat -lnt | awk '$6 == "LISTEN" && $4 ~ ".5000"') == "" ]]; do
-    	sleep 0.1
+		sleep 0.1
 	done
 
 	echo "[info] Configuring Flood..."
-	
-	# if flood config file doesnt exist then copy from containr to /config, and back again to capture user changes (cannot soft link thus copy back)
+
+	# if flood config file doesnt exist then copy from container to /config, and back again to capture user changes (cannot soft link thus copy back)
 	flood_config_path="/config/flood/config"
 	flood_install_path="/etc/webapps/flood"
 
@@ -31,7 +31,7 @@ if [[ "${ENABLE_FLOOD}" == "yes" || "${ENABLE_FLOOD}" == "both" ]]; then
 	echo "[info] Starting Flood..."
 
 	# run tmux attached to flood (non daemonized, blocking)
-	cd "${flood_install_path}" && /usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -s flood -n flood npm run start:production" &>/dev/null
+	cd "${flood_install_path}" && /usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -s flood -n flood npm start" &>/dev/null
 
 else
 

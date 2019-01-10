@@ -63,8 +63,8 @@ source /root/aur.sh
 # flood requires make for npm packages
 pacman -S base-devel --needed --noconfirm
 
-# install flood - note do not attempt to run 'npm run build' as we currently cannot do this during docker build time
-cd /etc/webapps/flood && npm install
+# run npm install -  note do not attempt to run 'npm run build' at this point as we need config.js
+cd "/etc/webapps/flood" && npm install
 
 # after flood install remove base devel excluding useful core packages
 pacman -Ru $(pacman -Qgq base-devel | grep -v awk | grep -v pacman | grep -v sed | grep -v grep | grep -v gzip | grep -v which) --noconfirm
@@ -81,67 +81,73 @@ tar -xvf /tmp/htpasswd.tar.gz -C /
 # config - php
 ####
 
+php_ini="/etc/php/php.ini"
+
 # configure php memory limit to improve performance
-sed -i -e "s~.*memory_limit\s\=\s.*~memory_limit = 512M~g" "/etc/php/php.ini"
+sed -i -e "s~.*memory_limit\s\=\s.*~memory_limit = 512M~g" "${php_ini}"
 
 # configure php max execution time to try and prevent timeout issues
-sed -i -e "s~.*max_execution_time\s\=\s.*~max_execution_time = 300~g" "/etc/php/php.ini"
+sed -i -e "s~.*max_execution_time\s\=\s.*~max_execution_time = 300~g" "${php_ini}"
 
 # configure php max file uploads to prevent issues with reaching limit of upload count
-sed -i -e "s~.*max_file_uploads\s\=\s.*~max_file_uploads = 200~g" "/etc/php/php.ini"
+sed -i -e "s~.*max_file_uploads\s\=\s.*~max_file_uploads = 200~g" "${php_ini}"
 
 # configure php max input variables (get/post/cookies) to prevent warnings issued
-sed -i -e "s~.*max_input_vars\s\=\s.*~max_input_vars = 10000~g" "/etc/php/php.ini"
+sed -i -e "s~.*max_input_vars\s\=\s.*~max_input_vars = 10000~g" "${php_ini}"
 
 # configure php upload max filesize to prevent large torrent files failing to upload
-sed -i -e "s~.*upload_max_filesize\s\=\s.*~upload_max_filesize = 20M~g" "/etc/php/php.ini"
+sed -i -e "s~.*upload_max_filesize\s\=\s.*~upload_max_filesize = 20M~g" "${php_ini}"
 
 # configure php post max size (linked to upload max filesize)
-sed -i -e "s~.*post_max_size\s\=\s.*~post_max_size = 25M~g" "/etc/php/php.ini"
+sed -i -e "s~.*post_max_size\s\=\s.*~post_max_size = 25M~g" "${php_ini}"
 
 # configure php with additional php-geoip module
-sed -i -e "/.*extension=gd/a extension=geoip" "/etc/php/php.ini"
+sed -i -e "/.*extension=gd/a extension=geoip" "${php_ini}"
 
 # configure php to enable sockets module (used for autodl-irssi plugin)
-sed -i -e "s~.*extension=sockets~extension=sockets~g" "/etc/php/php.ini"
+sed -i -e "s~.*extension=sockets~extension=sockets~g" "${php_ini}"
 
 # configure php-fpm to use tcp/ip connection for listener
-echo "" >> /etc/php/php-fpm.conf
-echo "; Set php-fpm to use tcp/ip connection" >> /etc/php/php-fpm.conf
-echo "listen = 127.0.0.1:7777" >> /etc/php/php-fpm.conf
+php_fpm_ini="/etc/php/php-fpm.conf"
+
+echo "" >> "${php_fpm_ini}"
+echo "; Set php-fpm to use tcp/ip connection" >> "${php_fpm_ini}"
+echo "listen = 127.0.0.1:7777" >> "${php_fpm_ini}"
 
 # configure php-fpm listener for user nobody, group users
-echo "" >> /etc/php/php-fpm.conf
-echo "; Specify user listener owner" >> /etc/php/php-fpm.conf
-echo "listen.owner = nobody" >> /etc/php/php-fpm.conf
-echo "" >> /etc/php/php-fpm.conf
-echo "; Specify user listener group" >> /etc/php/php-fpm.conf
-echo "listen.group = users" >> /etc/php/php-fpm.conf
+echo "" >> "${php_fpm_ini}"
+echo "; Specify user listener owner" >> "${php_fpm_ini}"
+echo "listen.owner = nobody" >> "${php_fpm_ini}"
+echo "" >> "${php_fpm_ini}"
+echo "; Specify user listener group" >> "${php_fpm_ini}"
+echo "listen.group = users" >> "${php_fpm_ini}"
 
 # config - rutorrent
 ####
+
+rutorrent_plugins_path="/usr/share/webapps/rutorrent/plugins"
 
 # set path to curl as rutorrent doesnt seem to find it on the path statement
 sed -i -r "s~\"curl\"\s+=>\s+'',~\"curl\"   => '/usr/bin/curl',~g" "/etc/webapps/rutorrent/conf/config.php"
 
 # set the rutorrent autotools/autowatch plugin to 30 secs scan time, default is 300 secs
-sed -i -e "s~\$autowatch_interval \= 300\;~\$autowatch_interval \= 30\;~g" "/usr/share/webapps/rutorrent/plugins/autotools/conf.php"
+sed -i -e "s~\$autowatch_interval \= 300\;~\$autowatch_interval \= 30\;~g" "${rutorrent_plugins_path}/autotools/conf.php"
 
 # set the rutorrent schedulder plugin to 10 mins, default is 60 mins
-sed -i -e "s~\$updateInterval \= 60\;~\$updateInterval \= 10\;~g" "/usr/share/webapps/rutorrent/plugins/scheduler/conf.php"
+sed -i -e "s~\$updateInterval \= 60\;~\$updateInterval \= 10\;~g" "${rutorrent_plugins_path}/scheduler/conf.php"
 
 # set the rutorrent diskspace plugin to point at the /data volume mapping, default is /
-sed -i -e "s~\$partitionDirectory \= \&\$topDirectory\;~\$partitionDirectory \= \"/data\";~g" "/usr/share/webapps/rutorrent/plugins/diskspace/conf.php"
+sed -i -e "s~\$partitionDirectory \= \&\$topDirectory\;~\$partitionDirectory \= \"/data\";~g" "${rutorrent_plugins_path}/diskspace/conf.php"
 
 # config - autodl-irssi
 ####
 
 # copy default configuration file
-cp "/usr/share/webapps/rutorrent/plugins/autodl-irssi/_conf.php" "/usr/share/webapps/rutorrent/plugins/autodl-irssi/conf.php"
+cp "/usr/share/webapps/rutorrent/plugins/autodl-irssi/_conf.php" "${rutorrent_plugins_path}/autodl-irssi/conf.php"
 
 # set config for autodl-irssi plugin
-sed -i -e 's~^$autodlPort.*~$autodlPort = 12345;~g' "/usr/share/webapps/rutorrent/plugins/autodl-irssi/conf.php"
-sed -i -e 's~^$autodlPassword.*~$autodlPassword = "autodl-irssi";~g' "/usr/share/webapps/rutorrent/plugins/autodl-irssi/conf.php"
+sed -i -e 's~^$autodlPort.*~$autodlPort = 12345;~g' "${rutorrent_plugins_path}/autodl-irssi/conf.php"
+sed -i -e 's~^$autodlPassword.*~$autodlPassword = "autodl-irssi";~g' "${rutorrent_plugins_path}/autodl-irssi/conf.php"
 
 # set config for autodl (must match port and password specified in /usr/share/webapps/rutorrent/plugins/autodl-irssi/conf.php)
 mkdir -p /home/nobody/.autodl
@@ -169,21 +175,27 @@ ln -s /usr/share/autodl-irssi/autodl-irssi.pl .
 # config - flood
 ####
 
+flood_install_path="/etc/webapps/flood"
+
 # copy config template file
-cp /etc/webapps/flood/config.template.js /etc/webapps/flood/config-backup.js
+cp "${flood_install_path}/config.template.js" "${flood_install_path}/config-backup.js"
 
 # modify template with connection details to rtorrent
-sed -i "s~host:.*~host: '127.0.0.1',~g" /etc/webapps/flood/config-backup.js
+sed -i "s~host:.*~host: '127.0.0.1',~g" "${flood_install_path}/config-backup.js"
 
 # point key and cert at nginx (note ssl not enabled by default)
-sed -i "s~sslKey:.*~sslKey: '/config/nginx/certs/host.key',~g" /etc/webapps/flood/config-backup.js
-sed -i "s~sslCert:.*~sslCert: '/config/nginx/certs/host.cert',~g" /etc/webapps/flood/config-backup.js
+sed -i "s~sslKey:.*~sslKey: '/config/nginx/certs/host.key',~g" "${flood_install_path}/config-backup.js"
+sed -i "s~sslCert:.*~sslCert: '/config/nginx/certs/host.cert',~g" "${flood_install_path}/config-backup.js"
 
 # set location of database (stores settings and user accounts)
-sed -i "s~dbPath:.*~dbPath: '/config/flood/db/',~g" /etc/webapps/flood/config-backup.js
+sed -i "s~dbPath:.*~dbPath: '/config/flood/db/',~g" "${flood_install_path}/config-backup.js"
 
 # set ip of host (talk on all ip's)
-sed -i "s~floodServerHost.*~floodServerHost: '0.0.0.0',~g" /etc/webapps/flood/config-backup.js
+sed -i "s~floodServerHost.*~floodServerHost: '0.0.0.0',~g" "${flood_install_path}/config-backup.js"
+
+# run npm build -  note we need to do this at this point as we need to have the modified config.js available for the build
+cp -f "${flood_install_path}/config-backup.js" "${flood_install_path}/config.js"
+cd "${flood_install_path}" && npm run build
 
 # container perms
 ####
