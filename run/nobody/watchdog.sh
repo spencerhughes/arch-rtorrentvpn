@@ -188,8 +188,11 @@ while true; do
 
 	fi
 
-	# run script to rotate nginx log files
-	source /home/nobody/logrotate.sh
+	# if flood not enabled then rotate nginx log (rutorrent)
+	if [[ "${ENABLE_FLOOD}" != "yes" ]]; then
+		# run script to rotate nginx log files
+		source /home/nobody/logrotate.sh
+	fi
 
 	sleep 30s
 
