@@ -121,6 +121,9 @@ rutorrent_plugins_path="/usr/share/webapps/rutorrent/plugins"
 # set path to curl as rutorrent doesnt seem to find it on the path statement
 sed -i -r "s~\"curl\"\s+=>\s+'',~\"curl\"   => '/usr/bin/curl',~g" "/etc/webapps/rutorrent/conf/config.php"
 
+# increase rpc timeout from 5 seconds (default) for rutorrent, as large number of torrents can mean we exceed the 5 second period
+sed -i -r "s~'RPC_TIME_OUT', [0-9]+,~'RPC_TIME_OUT', 60,~g" "/etc/webapps/rutorrent/conf/config.php"
+
 # set the rutorrent autotools/autowatch plugin to 30 secs scan time, default is 300 secs
 sed -i -e "s~\$autowatch_interval \= 300\;~\$autowatch_interval \= 30\;~g" "${rutorrent_plugins_path}/autotools/conf.php"
 
