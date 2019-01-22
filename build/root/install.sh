@@ -54,6 +54,9 @@ source /root/aur.sh
 # flood requires make for npm packages
 pacman -S base-devel --needed --noconfirm
 
+# install npm package 'forever' - this is used to restart flood on crash
+npm install -g forever
+
 # run npm install -  note do not attempt to run 'npm run build' at this point as we need config.js
 cd "/etc/webapps/flood" && npm install
 
