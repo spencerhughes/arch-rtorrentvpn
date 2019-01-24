@@ -31,7 +31,7 @@ if [[ "${ENABLE_FLOOD}" == "yes" || "${ENABLE_FLOOD}" == "both" ]]; then
 	echo "[info] Starting Flood..."
 
 	# run flood (non daemonized, blocking) via npm package 'forever' (restart on crash)
-	cd "${flood_install_path}" && /usr/bin/script /home/nobody/typescript --command "forever start -c 'npm start' ." &>/dev/null
+	cd "${flood_install_path}" && /usr/bin/script /home/nobody/typescript --command "forever start --minUptime 1000 --spinSleepTime 1000 -c 'npm start' ." &>/dev/null
 
 else
 
