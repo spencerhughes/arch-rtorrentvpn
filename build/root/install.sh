@@ -25,7 +25,7 @@ source /root/upd.sh
 pacman -S nodejs-lts-dubnium --needed --noconfirm
 
 # define pacman packages
-pacman_packages="git nginx php-fpm rsync openssl tmux gnu-netcat mediainfo npm php-geoip ipcalc unrar unzip libx264 libvpx libtorrent rtorrent"
+pacman_packages="git nginx php-fpm rsync openssl tmux mediainfo npm php-geoip unrar unzip libx264 libvpx libtorrent rtorrent"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
@@ -436,6 +436,8 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 		echo "[warn] ENABLE_PRIVOXY not defined (via -e ENABLE_PRIVOXY), defaulting to 'no'" | ts '%Y-%m-%d %H:%M:%.S'
 		export ENABLE_PRIVOXY="no"
 	fi
+
+	export RUN_UP_SCRIPT="yes"
 
 fi
 
