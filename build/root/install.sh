@@ -15,6 +15,20 @@ unzip /tmp/scripts-master.zip -d /tmp
 # move shell scripts to /root
 mv /tmp/scripts-master/shell/arch/docker/*.sh /root/
 
+# custom
+####
+
+rtorrentps_package_name="rtorrent-ps.tar.xz"
+
+# download compiled rtorrent-ps (cannot compile during docker build)
+/root/curly.sh -rc 6 -rw 10 -of "/tmp/${rtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/rtorrent-ps-1.1.r38.gd52abd2-1-any.pkg.tar.xz"
+
+# install rtorrent-ps with no dependencies (install libtorrent-ps using aur script)
+pacman -Udd "/tmp/${rtorrentps_package_name}" --noconfirm
+
+# set tmux to use 256 colors (required by rtorrent-ps)
+echo 'set -g default-terminal "screen-256color"' > /home/nobody/.tmux.conf
+
 # pacman packages
 ####
 
@@ -25,7 +39,7 @@ source /root/upd.sh
 pacman -S nodejs-lts-dubnium --needed --noconfirm
 
 # define pacman packages
-pacman_packages="git nginx php-fpm rsync openssl tmux mediainfo npm php-geoip unrar unzip libx264 libvpx libtorrent rtorrent"
+pacman_packages="git nginx php-fpm rsync openssl tmux mediainfo npm php-geoip unrar unzip libx264 libvpx xmlrpc-c"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
@@ -36,7 +50,7 @@ fi
 ####
 
 # define aur packages
-aur_packages="rutorrent autodl-irssi-community"
+aur_packages="libtorrent-ps rutorrent autodl-irssi-community"
 
 # call aur install script (arch user repo) - note true required due to autodl-irssi error during install
 source /root/aur.sh
