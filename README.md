@@ -1,6 +1,6 @@
 **Application**
 
-[rTorrent](https://github.com/rakshasa/rtorrent)  
+[rTorrent-ps](https://github.com/pyroscope/rtorrent-ps)  
 [ruTorrent](https://github.com/Novik/ruTorrent)  
 [autodl-irssi](https://github.com/autodl-community/autodl-irssi)  
 [Flood](https://github.com/jfurrow/flood)  
@@ -13,7 +13,7 @@ rTorrent is a quick and efficient BitTorrent client that uses, and is in develop
 
 **Build notes**
 
-Latest stable rTorrent release from Arch Linux.
+Latest stable rTorrent-ps release from Arch Linux AUR.
 Latest stable ruTorrent release from Arch Linux AUR.
 Latest GitHub commit to master branch for Flood.
 Latest stable OpenVPN release from Arch Linux repo.
@@ -114,9 +114,9 @@ AirVPN users will need to generate a unique OpenVPN configuration file by using 
 5. Start rtorrentvpn docker
 6. Check supervisor.log to make sure you are connected to the tunnel
 
-AirVPN users will also need to create a port forward by using the following link https://airvpn.org/ports/ and clicking Add. This port will need to be specified in the rTorrent configuration file located at /config/rtorrent/config/rtorrent.rc with the option `port_range = <start incoming port>-<end incoming port>` and `port_random = no`.
+AirVPN users will also need to create a port forward by using the following link https://airvpn.org/ports/ and clicking Add. This port will need to be specified in the rTorrent-ps configuration file located at /config/rtorrent/config/rtorrent.rc with the option `port_range = <start incoming port>-<end incoming port>` and `port_random = no`.
 
-rTorrent example config
+rTorrent-ps example config
 ```
 port_range = 49400-49400
 port_random = no
