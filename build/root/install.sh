@@ -32,9 +32,6 @@ echo 'set -g default-terminal "screen-256color"' > /home/nobody/.tmux.conf
 # pacman packages
 ####
 
-# call pacman db and package updater script
-source /root/upd.sh
-
 # flood currently requires nodejs v10 (package name nodejs-lts-dubnium), not v11 (package name nodejs) thus we force install of v10 before we proceed to install npm (dependency nodejs)
 pacman -S nodejs-lts-dubnium --needed --noconfirm
 
@@ -55,7 +52,19 @@ aur_packages="libtorrent-ps rutorrent autodl-irssi-community"
 # call aur install script (arch user repo) - note true required due to autodl-irssi error during install
 source /root/aur.sh
 
-# github releases
+# github release - pyrocore
+####
+
+# download pyrocore tools for rtorrent-ps
+git clone "https://github.com/pyroscope/pyrocore.git" "/opt/pyrocore" && cd "/opt/pyrocore"
+
+# manually create folder, used to create symlinks to pyrocore binaries
+mkdir -p "/home/nobody/bin"
+
+# run install script which updates to github head and then installs python modules using pip
+./update-to-head.sh
+
+# github release - flood
 ####
 
 # download flood ui for rtorrent

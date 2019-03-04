@@ -29,6 +29,9 @@ RUN chmod +x /root/*.sh /home/nobody/*.sh && \
 # docker settings
 #################
 
+# add pyrocore symlinks to path - symlinks from /opt/pyrocore to /home/nobody/bin
+ENV PATH="${PATH}:/home/nobody/bin"
+
 # map /config to host defined config path (used to store configuration from app)
 VOLUME /config
 
