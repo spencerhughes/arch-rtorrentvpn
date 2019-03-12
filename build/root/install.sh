@@ -64,6 +64,15 @@ mkdir -p "/home/nobody/bin"
 # run install script which updates to github head and then installs python modules using pip
 ./update-to-head.sh
 
+# install additional python modules using pip (pip laid on disk as part of pyrocore) - required
+# for pycore torque utility
+# note we also require gcc to compile python module psutil
+pacman -S --needed gcc --noconfirm
+/opt/pyrocore/bin/pip install --ignore-installed -r "/opt/pyrocore/requirements-torque.txt"
+
+# once psutil is compiled then remove gcc
+pacman -Ru gcc --noconfirm
+
 # github release - flood
 ####
 
