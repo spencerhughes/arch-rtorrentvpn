@@ -170,6 +170,42 @@ else
 		rm -rf /config/rutorrent/plugins 2>/dev/null || true
 	fi
 
+	# below code is only required to transition over existing users to
+	# ensure basic auth for rpc2, new users will have this already set.
+	# this code should be safe to remove at end of 2019 delme
+	#
+	# check that rpc2 is defined (maybe deleted by user)
+	check_rpc2_exists=$(awk '/location \/RPC2 {/,/\}/' /config/nginx/config/nginx.conf)
+
+	if [[ ! -z "${check_rpc2_exists}" ]]; then
+
+		# check rpc2 is secure
+		check_rpc2_secure=$(awk '/location \/RPC2 {/,/\}/' /config/nginx/config/nginx.conf | xargs -0 | grep -ioP 'auth_basic "Restricted Content";')
+
+		if [[ -z "${check_rpc2_secure}" ]]; then
+
+			echo "[info] nginx /rpc2 location is not secure, enabling basic auth..."
+
+			# delete existing /rpc2 location (cannot easily edit and replace lines without insertion
+			sed -i '/location \/RPC2/,/}/d' "/config/nginx/config/nginx.conf"
+
+# re-insert /rpc2 location with new secure settings using commewnt as anchor (ugly formating due to spaces used in nginx.conf)
+sed -i 's~# include scgi for rtorent.*~# include scgi for rtorent\
+        location /RPC2 {\
+            include scgi_params;\
+            scgi_pass 127.0.0.1:5000;\
+            auth_basic "Restricted Content";\
+            auth_basic_user_file /config/nginx/security/auth;\
+        }~g' /config/nginx/config/nginx.conf
+
+		else
+
+			echo "[info] nginx /rpc2 location is secure"
+
+		fi
+
+	fi
+
 	echo "[info] starting php-fpm..."
 
 	# run php-fpm and specify path to pid file
