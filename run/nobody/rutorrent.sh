@@ -198,12 +198,12 @@ else
 	fi
 
 	# if rpc enabled then proceed, else delete
-	if [[ "${ENABLE_RPC}" == "yes" ]]; then
+	if [[ "${ENABLE_RPC2}" == "yes" ]]; then
 
 		echo "[info] nginx /rpc2 location enabled"
 
 		# if rpc authentication enabled then add in lines
-		if [[ "${ENABLE_RPC_AUTH}" == "yes" ]]; then
+		if [[ "${ENABLE_RPC2_AUTH}" == "yes" ]]; then
 
 			# check rpc2 is secure
 			check_rpc2_secure=$(awk '/location \/RPC2 {/,/\}/' /config/nginx/config/nginx.conf | xargs -0 | grep -ioP 'auth_basic "Restricted Content";')
@@ -241,7 +241,7 @@ else
 
 	else
 
-		echo "[info] nginx /rpc2 location is secure"
+		echo "[info] nginx /rpc2 location not enabled"
 
 		# delete existing /rpc2 location
 		sed -i '/location \/RPC2/,/}/d' "/config/nginx/config/nginx.conf"
