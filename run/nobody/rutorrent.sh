@@ -13,7 +13,6 @@ sed -i 's~# include scgi for rtorent.*~# include scgi for rtorent\
             auth_basic "Restricted Content";\
             auth_basic_user_file /config/nginx/security/auth;\
         }~g' /config/nginx/config/nginx.conf
-}
 
 else
 
@@ -23,7 +22,6 @@ sed -i 's~# include scgi for rtorent.*~# include scgi for rtorent\
             include scgi_params;\
             scgi_pass 127.0.0.1:5000;\
         }~g' /config/nginx/config/nginx.conf
-}
 
 fi
 
