@@ -1,5 +1,34 @@
 #!/bin/bash
 
+# function to enable rpc2 with or without authentication
+function enable_rpc {
+
+if [[ $1 == "enable_auth" ]]; then
+
+# inserts /rpc2 location (basic auth) into existing nginx.conf
+sed -i 's~# include scgi for rtorent.*~# include scgi for rtorent\
+        location /RPC2 {\
+            include scgi_params;\
+            scgi_pass 127.0.0.1:5000;\
+            auth_basic "Restricted Content";\
+            auth_basic_user_file /config/nginx/security/auth;\
+        }~g' /config/nginx/config/nginx.conf
+}
+
+else
+
+# inserts /rpc2 location (no auth) into existing nginx.conf
+sed -i 's~# include scgi for rtorent.*~# include scgi for rtorent\
+        location /RPC2 {\
+            include scgi_params;\
+            scgi_pass 127.0.0.1:5000;\
+        }~g' /config/nginx/config/nginx.conf
+}
+
+fi
+
+}
+
 # if flood enabled then log
 if [[ "${ENABLE_FLOOD}" == "yes" ]]; then
 
@@ -170,39 +199,54 @@ else
 		rm -rf /config/rutorrent/plugins 2>/dev/null || true
 	fi
 
-	# below code is only required to transition over existing users to
-	# ensure basic auth for rpc2, new users will have this already set.
-	# this code should be safe to remove at end of 2019 delme
-	#
-	# check that rpc2 is defined (maybe deleted by user)
-	check_rpc2_exists=$(awk '/location \/RPC2 {/,/\}/' /config/nginx/config/nginx.conf)
+	# if rpc enabled then proceed, else delete
+	if [[ "${ENABLE_RPC}" == "yes" ]]; then
 
-	if [[ ! -z "${check_rpc2_exists}" ]]; then
+		echo "[info] nginx /rpc2 location enabled"
 
-		# check rpc2 is secure
-		check_rpc2_secure=$(awk '/location \/RPC2 {/,/\}/' /config/nginx/config/nginx.conf | xargs -0 | grep -ioP 'auth_basic "Restricted Content";')
+		# if rpc authentication enabled then add in lines
+		if [[ "${ENABLE_RPC_AUTH}" == "yes" ]]; then
 
-		if [[ -z "${check_rpc2_secure}" ]]; then
+			# check rpc2 is secure
+			check_rpc2_secure=$(awk '/location \/RPC2 {/,/\}/' /config/nginx/config/nginx.conf | xargs -0 | grep -ioP 'auth_basic "Restricted Content";')
 
-			echo "[info] nginx /rpc2 location is not secure, enabling basic auth..."
+			if [[ -z "${check_rpc2_secure}" ]]; then
 
-			# delete existing /rpc2 location (cannot easily edit and replace lines without insertion
-			sed -i '/location \/RPC2/,/}/d' "/config/nginx/config/nginx.conf"
+				echo "[info] enabling basic auth for /rpc2..."
 
-# re-insert /rpc2 location with new secure settings using commewnt as anchor (ugly formating due to spaces used in nginx.conf)
-sed -i 's~# include scgi for rtorent.*~# include scgi for rtorent\
-        location /RPC2 {\
-            include scgi_params;\
-            scgi_pass 127.0.0.1:5000;\
-            auth_basic "Restricted Content";\
-            auth_basic_user_file /config/nginx/security/auth;\
-        }~g' /config/nginx/config/nginx.conf
+				# delete existing /rpc2 location (cannot easily edit and replace lines without insertion)
+				sed -i '/location \/RPC2/,/}/d' "/config/nginx/config/nginx.conf"
 
+				# call function to enable authentication for rpc2
+				enable_rpc "enable_auth"
+
+			fi
+		
 		else
 
-			echo "[info] nginx /rpc2 location is secure"
+			# check rpc2 is defined
+			check_rpc2_defined=$(awk '/location \/RPC2 {/,/\}/' /config/nginx/config/nginx.conf | xargs -0 | grep -ioP 'scgi_pass 127.0.0.1:5000;')
+
+			if [[ -z "${check_rpc2_defined}" ]]; then
+
+				echo "[info] disabling basic auth for /rpc2..."
+
+				# delete existing /rpc2 location (cannot easily edit and replace lines without insertion)
+				sed -i '/location \/RPC2/,/}/d' "/config/nginx/config/nginx.conf"
+
+				# call function to disable authentication for rpc2
+				enable_rpc "disable_auth"
+
+			fi
 
 		fi
+
+	else
+
+		echo "[info] nginx /rpc2 location is secure"
+
+		# delete existing /rpc2 location
+		sed -i '/location \/RPC2/,/}/d' "/config/nginx/config/nginx.conf"
 
 	fi
 

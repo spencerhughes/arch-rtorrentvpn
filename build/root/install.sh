@@ -489,6 +489,22 @@ else
 	export ENABLE_AUTODL_IRSSI="no"
 fi
 
+export ENABLE_RPC2=$(echo "${ENABLE_RPC2}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+if [[ ! -z "${ENABLE_RPC2}" ]]; then
+	echo "[info] ENABLE_RPC2 defined as '${ENABLE_RPC2}'" | ts '%Y-%m-%d %H:%M:%.S'
+else
+	echo "[warn] ENABLE_RPC2 not defined (via -e ENABLE_RPC2), defaulting to 'yes'" | ts '%Y-%m-%d %H:%M:%.S'
+	export ENABLE_RPC2="yes"
+fi
+
+export ENABLE_RPC2_AUTH=$(echo "${ENABLE_RPC2_AUTH}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+if [[ ! -z "${ENABLE_RPC2_AUTH}" ]]; then
+	echo "[info] ENABLE_RPC2_AUTH defined as '${ENABLE_RPC2_AUTH}'" | ts '%Y-%m-%d %H:%M:%.S'
+else
+	echo "[warn] ENABLE_RPC2_AUTH not defined (via -e ENABLE_RPC2_AUTH), defaulting to 'yes'" | ts '%Y-%m-%d %H:%M:%.S'
+	export ENABLE_RPC2_AUTH="yes"
+fi
+
 EOF
 
 # replace env vars placeholder string with contents of file (here doc)
