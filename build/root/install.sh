@@ -115,7 +115,7 @@ tar -xvf /tmp/htpasswd.tar.gz -C /
 php_ini="/etc/php/php.ini"
 
 # configure php memory limit to improve performance
-sed -i -e "s~.*memory_limit\s\=\s.*~memory_limit = 512M~g" "${php_ini}"
+sed -i -e "s~.*memory_limit\s\=\s.*~memory_limit = 768M~g" "${php_ini}"
 
 # configure php max execution time to try and prevent timeout issues
 sed -i -e "s~.*max_execution_time\s\=\s.*~max_execution_time = 300~g" "${php_ini}"
