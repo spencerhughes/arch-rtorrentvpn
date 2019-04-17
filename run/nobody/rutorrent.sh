@@ -105,8 +105,8 @@ else
 	ln -fs /config/nginx/config/nginx.conf /etc/nginx/nginx.conf
 
 	# if conf folder exists in container then rename
-	if [[ -d "/etc/webapps/rutorrent/conf" && ! -L "/etc/webapps/rutorrent/conf" ]]; then
-		mv /etc/webapps/rutorrent/conf /etc/webapps/rutorrent/conf-backup 2>/dev/null || true
+	if [[ -d "/usr/share/webapps/rutorrent/conf" && ! -L "/usr/share/webapps/rutorrent/conf" ]]; then
+		mv /usr/share/webapps/rutorrent/conf /usr/share/webapps/rutorrent/conf-backup 2>/dev/null || true
 	fi
 
 	# if rutorrent conf folder doesnt exist then copy default to host config volume (soft linked)
@@ -115,8 +115,8 @@ else
 		echo "[info] rutorrent conf folder doesnt exist, copying default to /config/rutorrent/conf/..."
 
 		mkdir -p /config/rutorrent/conf
-		if [[ -d "/etc/webapps/rutorrent/conf-backup" && ! -L "/etc/webapps/rutorrent/conf-backup" ]]; then
-			cp -R /etc/webapps/rutorrent/conf-backup/* /config/rutorrent/conf/ 2>/dev/null || true
+		if [[ -d "/usr/share/webapps/rutorrent/conf-backup" && ! -L "/usr/share/webapps/rutorrent/conf-backup" ]]; then
+			cp -R /usr/share/webapps/rutorrent/conf-backup/* /config/rutorrent/conf/ 2>/dev/null || true
 		fi
 
 	else
@@ -126,11 +126,11 @@ else
 	fi
 
 	# create soft link to rutorrent conf folder
-	ln -fs /config/rutorrent/conf /etc/webapps/rutorrent
+	ln -fs /config/rutorrent/conf /usr/share/webapps/rutorrent
 
 	# copy plugins.ini from container to host volume map required for users
 	# with existing plugins.ini, new users will not need this, please remove
-	cp -f /etc/webapps/rutorrent/conf-backup/plugins.ini /config/rutorrent/conf/plugins.ini
+	cp -f /usr/share/webapps/rutorrent/conf-backup/plugins.ini /config/rutorrent/conf/plugins.ini
 
 	# if autodl-irssi enabled then enable plugin and copy config
 	if [[ "${ENABLE_AUTODL_IRSSI}" == "yes" ]]; then

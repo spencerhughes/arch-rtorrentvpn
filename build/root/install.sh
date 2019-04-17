@@ -36,7 +36,7 @@ echo 'set -g default-terminal "screen-256color"' > /home/nobody/.tmux.conf
 pacman -S nodejs-lts-dubnium --needed --noconfirm
 
 # define pacman packages
-pacman_packages="git nginx php-fpm rsync openssl tmux mediainfo npm php-geoip unrar unzip libx264 libvpx xmlrpc-c"
+pacman_packages="git nginx php-fpm rsync openssl tmux mediainfo npm php-geoip unrar unzip libx264 libvpx xmlrpc-c sox python-pip"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
@@ -47,10 +47,19 @@ fi
 ####
 
 # define aur packages
-aur_packages="libtorrent-ps rutorrent autodl-irssi-community"
+aur_packages="libtorrent-ps autodl-irssi-community"
 
 # call aur install script (arch user repo) - note true required due to autodl-irssi error during install
 source /root/aur.sh
+
+# github release - rutorrent
+####
+
+# download rutorrent
+/root/github.sh -df github-rutorrent.zip -dp "/tmp" -ep "/tmp/extracted" -ip "/usr/share/webapps/rutorrent" -go "Novik" -gr "ruTorrent" -rt "source"
+
+# rutorrent plugin cloudflare requires python module 'CfScrape'
+pip install CfScrape
 
 # github release - pyrocore
 ####
@@ -73,7 +82,7 @@ pacman -S --needed gcc --noconfirm
 # once psutil is compiled then remove gcc
 pacman -Ru gcc --noconfirm
 
-# github release - flood
+# github master branch - flood
 ####
 
 # download flood ui for rtorrent
@@ -147,13 +156,36 @@ echo "listen.group = users" >> "${php_fpm_ini}"
 # config - rutorrent
 ####
 
-rutorrent_plugins_path="/usr/share/webapps/rutorrent/plugins"
+# define path variables
+rutorrent_root_path="/usr/share/webapps/rutorrent"
+rutorrent_config_path="${rutorrent_root_path}/conf"
+rutorrent_plugins_path="${rutorrent_root_path}/plugins"
 
-# set path to curl as rutorrent doesnt seem to find it on the path statement
-sed -i -r "s~\"curl\"\s+=>\s+'',~\"curl\"   => '/usr/bin/curl',~g" "/etc/webapps/rutorrent/conf/config.php"
+# remove external applications section from default config.php
+# note this removes the lines between the patterns but not the
+# pattern itself, as this is then used as an anchor for the 
+# re-insertion of the defined section (see next block).
+sed -i '/$pathToExternals = array(/,/);/{//!d}' "${rutorrent_config_path}/config.php"
+
+# defines paths to external applications in default config.php
+# this uses the pattern as an anchor point from the previous 
+# command
+# note the use of single quoted string to reduce escaping,
+# also note the use of unicode hex char '\x27' which is a
+# single quote, required as escaping a single quote in a
+# single quoted string is tricky.
+sed -i 's~$pathToExternals = array(.*~$pathToExternals = array(\
+                "php"           => \x27/usr/bin/php\x27,              // Something like /usr/bin/php. If empty, will be found in PATH.\
+                "curl"          => \x27/usr/bin/curl\x27,             // Something like /usr/bin/curl. If empty, will be found in PATH.\
+                "gzip"          => \x27/usr/bin/gzip\x27,             // Something like /usr/bin/gzip. If empty, will be found in PATH.\
+                "id"            => \x27/usr/bin/id\x27,               // Something like /usr/bin/id. If empty, will be found in PATH.\
+                "python"        => \x27/usr/bin/python\x27,           // Something like /usr/bin/python. If empty, will be found in PATH.\
+                "pgrep"         => \x27/usr/bin/pgrep\x27,            // Something like /usr/bin/pgrep. If empty, will be found in PATH.\
+                "sox"           => \x27/usr/bin/sox\x27,              // Something like /usr/bin/sox. If empty, will be found in PATH.\
+                "stat"          => \x27/usr/bin/stat\x27,             // Something like /usr/bin/stat. If empty, will be found in PATH.~g' "${rutorrent_config_path}/config.php"
 
 # increase rpc timeout from 5 seconds (default) for rutorrent, as large number of torrents can mean we exceed the 5 second period
-sed -i -r "s~'RPC_TIME_OUT', [0-9]+,~'RPC_TIME_OUT', 60,~g" "/etc/webapps/rutorrent/conf/config.php"
+sed -i -r "s~'RPC_TIME_OUT', [0-9]+,~'RPC_TIME_OUT', 60,~g" "${rutorrent_config_path}/config.php"
 
 # set the rutorrent autotools/autowatch plugin to 30 secs scan time, default is 300 secs
 sed -i -e "s~\$autowatch_interval \= 300\;~\$autowatch_interval \= 30\;~g" "${rutorrent_plugins_path}/autotools/conf.php"
@@ -184,7 +216,7 @@ EOF
 
 # add in option to enable/disable autodl-irssi plugin depending on env var
 # ENABLE_AUTODL_IRSSI value which is set when /home/nobody/irssi.sh runs
-cat <<'EOF' >> "/etc/webapps/rutorrent/conf/plugins.ini"
+cat <<'EOF' >> "${rutorrent_config_path}/plugins.ini"
 
 [autodl-irssi]
 enabled = no
