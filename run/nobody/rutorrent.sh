@@ -27,6 +27,24 @@ fi
 
 }
 
+# function to configure php paths to external apps for existing users - delme 20200417
+function configure_php {
+
+# remove external applications section from users config.php
+sed -i '/$pathToExternals = array(/,/);/{//!d}' "/config/rutorrent/conf/config.php"
+
+# defines paths to external applications in users config.php
+sed -i 's~$pathToExternals = array(.*~$pathToExternals = array(\
+                "php"           => \x27/usr/bin/php\x27,              // Something like /usr/bin/php. If empty, will be found in PATH.\
+                "curl"          => \x27/usr/bin/curl\x27,             // Something like /usr/bin/curl. If empty, will be found in PATH.\
+                "gzip"          => \x27/usr/bin/gzip\x27,             // Something like /usr/bin/gzip. If empty, will be found in PATH.\
+                "id"            => \x27/usr/bin/id\x27,               // Something like /usr/bin/id. If empty, will be found in PATH.\
+                "python"        => \x27/usr/bin/python\x27,           // Something like /usr/bin/python. If empty, will be found in PATH.\
+                "pgrep"         => \x27/usr/bin/pgrep\x27,            // Something like /usr/bin/pgrep. If empty, will be found in PATH.\
+                "sox"           => \x27/usr/bin/sox\x27,              // Something like /usr/bin/sox. If empty, will be found in PATH.\
+                "stat"          => \x27/usr/bin/stat\x27,             // Something like /usr/bin/stat. If empty, will be found in PATH.~g' "/config/rutorrent/conf/config.php"
+}
+
 # if flood enabled then log
 if [[ "${ENABLE_FLOOD}" == "yes" ]]; then
 
@@ -122,6 +140,11 @@ else
 	else
 
 		echo "[info] rutorrent conf folder already exists, skipping copy"
+
+		if ! (grep 'python' "/config/rutorrent/conf/config.php"); then
+			echo "[info] php configuration missing external application paths, configuring..."
+			configure_php
+		fi
 
 	fi
 
