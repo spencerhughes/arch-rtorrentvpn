@@ -3,19 +3,19 @@
 # kill rtorrent (required due to the fact rtorrent cannot cope with dynamic changes to port)
 if [[ "${rtorrent_running}" == "true" ]]; then
 
-    # note its not currently possible to change port and/or ip address whilst running, thus the sigterm
-    echo "[info] Sending SIGTERM (-15) to 'tmux: server' (will terminate rtorrent) due to port/ip change..."
+	# note its not currently possible to change port and/or ip address whilst running, thus the sigterm
+	echo "[info] Sending SIGTERM (-15) to 'tmux: server' (will terminate rtorrent) due to port/ip change..."
 
-    # SIGTERM used here as SIGINT does not kill the process
-    pkill -SIGTERM "tmux\: server"
+	# SIGTERM used here as SIGINT does not kill the process
+	pkill -SIGTERM "tmux\: server"
 
-    # make sure 'rtorrent main' process DOESNT exist before re-starting
-    while pgrep -x "rtorrent main" &> /dev/null
-    do
+	# make sure 'rtorrent main' process DOESNT exist before re-starting
+	while pgrep -x "rtorrent main" &> /dev/null
+	do
 
-        sleep 0.5s
+		sleep 0.5s
 
-    done
+	done
 
 fi
 
@@ -55,37 +55,38 @@ fi
 retry_count=30
 while true; do
 
-    if ! pgrep -x "rtorrent main" > /dev/null; then
+	if ! pgrep -x "rtorrent main" > /dev/null; then
 
-        retry_count=$((retry_count-1))
-        if [ "${retry_count}" -eq "0" ]; then
+		retry_count=$((retry_count-1))
+		if [ "${retry_count}" -eq "0" ]; then
 
-            echo "[warn] Wait for rTorrent process to start aborted"
-            break
+			echo "[warn] Wait for rTorrent process to start aborted, too many retries"
+			echo "[warn] Showing output from command before exit..."
+			timeout 10 /usr/bin/rtorrent -b "${vpn_ip}" -o ip="${external_ip}" ; exit 1
 
-        else
+		else
 
-            if [[ "${DEBUG}" == "true" ]]; then
-                echo "[debug] Waiting for rTorrent process to start..."
-            fi
+			if [[ "${DEBUG}" == "true" ]]; then
+				echo "[debug] Waiting for rTorrent process to start..."
+			fi
 
-            sleep 1s
+			sleep 1s
 
-        fi
+		fi
 
-    else
+	else
 
-        echo "[info] rTorrent process started"
-        break
+		echo "[info] rTorrent process started"
+		break
 
-    fi
+	fi
 
 done
 
 echo "[info] Waiting for rTorrent process to start listening on port 5000..."
 
 while [[ $(netstat -lnt | awk '$6 == "LISTEN" && $4 ~ ".5000"') == "" ]]; do
-    sleep 0.1
+	sleep 0.1
 done
 
-echo "[info] rTorrent process listening"
+echo "[info] rTorrent process listening on port 5000"
