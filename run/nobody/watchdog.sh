@@ -44,6 +44,7 @@ while true; do
 
 	# reset triggers to negative values
 	rtorrent_running="false"
+	privoxy_running="false"
 	ip_change="false"
 	port_change="false"
 
@@ -74,6 +75,22 @@ while true; do
 
 				# mark as rtorrent as running
 				rtorrent_running="true"
+
+			fi
+
+			if [[ "${ENABLE_PRIVOXY}" == "yes" ]]; then
+
+				# check if privoxy is running, if not then skip shutdown of process
+				if ! pgrep -fa "privoxy" > /dev/null; then
+
+					echo "[info] Privoxy not running"
+
+				else
+
+					# mark as privoxy as running
+					privoxy_running="true"
+
+				fi
 
 			fi
 
@@ -143,6 +160,17 @@ while true; do
 
 			fi
 
+			if [[ "${ENABLE_PRIVOXY}" == "yes" ]]; then
+
+				if [[ "${privoxy_running}" == "false" ]]; then
+
+					# run script to start privoxy
+					source /home/nobody/privoxy.sh
+
+				fi
+
+			fi
+
 		else
 
 			echo "[warn] VPN IP not detected, VPN tunnel maybe down"
@@ -169,6 +197,20 @@ while true; do
 
 			# run script to initialise rutorrent plugins
 			source /home/nobody/initplugins.sh
+
+		fi
+
+		if [[ "${ENABLE_PRIVOXY}" == "yes" ]]; then
+
+			# check if privoxy is running, if not then start via privoxy.sh
+			if ! pgrep -fa "privoxy" > /dev/null; then
+
+				echo "[info] Privoxy not running"
+
+				# run script to start privoxy
+				source /home/nobody/privoxy.sh
+
+			fi
 
 		fi
 
