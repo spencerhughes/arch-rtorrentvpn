@@ -74,13 +74,6 @@ if [[ $iptable_mangle_exit_code == 0 ]]; then
 	ip rule add fwmark 2 table rutorrent_https
 	ip route add default via $DEFAULT_GATEWAY table rutorrent_https
 
-	# setup route for flood using set-mark to route traffic for port 3000 to lan
-	if [[ $ENABLE_FLOOD == "yes" || $ENABLE_FLOOD == "both" ]]; then
-		echo "3000    flood" >> /etc/iproute2/rt_tables
-		ip rule add fwmark 3 table flood
-		ip route add default via $DEFAULT_GATEWAY table flood
-	fi
-
 fi
 
 # input iptable rules
@@ -91,9 +84,6 @@ iptables -P INPUT DROP
 
 # set policy to drop ipv6 for input
 ip6tables -P INPUT DROP 1>&- 2>&-
-
-# accept input to tunnel adapter
-iptables -A INPUT -i "${VPN_DEVICE_TYPE}" -j ACCEPT
 
 # accept input to/from docker containers (172.x range is internal dhcp)
 iptables -A INPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j ACCEPT
@@ -108,12 +98,6 @@ iptables -A INPUT -i "${docker_interface}" -p tcp --sport 9080 -j ACCEPT
 # accept input to rutorrent port 9443
 iptables -A INPUT -i "${docker_interface}" -p tcp --dport 9443 -j ACCEPT
 iptables -A INPUT -i "${docker_interface}" -p tcp --sport 9443 -j ACCEPT
-
-# accept input to flood port 3000 if enabled
-if [[ $ENABLE_FLOOD == "yes" || $ENABLE_FLOOD == "both" ]]; then
-	iptables -A INPUT -i "${docker_interface}" -p tcp --dport 3000 -j ACCEPT
-	iptables -A INPUT -i "${docker_interface}" -p tcp --sport 3000 -j ACCEPT
-fi
 
 # process lan networks in the list
 for lan_network_item in "${lan_network_list[@]}"; do
@@ -137,6 +121,18 @@ iptables -A INPUT -p icmp --icmp-type echo-reply -j ACCEPT
 # accept input to local loopback
 iptables -A INPUT -i lo -j ACCEPT
 
+# accept input to tunnel adapter
+iptables -A INPUT -i "${VPN_DEVICE_TYPE}" -j ACCEPT
+
+# forward iptable rules
+###
+
+# set policy to drop ipv4 for forward
+iptables -P FORWARD DROP
+
+# set policy to drop ipv6 for forward
+ip6tables -P FORWARD DROP 1>&- 2>&-
+
 # output iptable rules
 ###
 
@@ -145,9 +141,6 @@ iptables -P OUTPUT DROP
 
 # set policy to drop ipv6 for output
 ip6tables -P OUTPUT DROP 1>&- 2>&-
-
-# accept output from tunnel adapter
-iptables -A OUTPUT -o "${VPN_DEVICE_TYPE}" -j ACCEPT
 
 # accept output to/from docker containers (172.x range is internal dhcp)
 iptables -A OUTPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j ACCEPT
@@ -166,12 +159,6 @@ if [[ $iptable_mangle_exit_code == 0 ]]; then
 	iptables -t mangle -A OUTPUT -p tcp --dport 9443 -j MARK --set-mark 2
 	iptables -t mangle -A OUTPUT -p tcp --sport 9443 -j MARK --set-mark 2
 
-	# accept output from flood port 3000 if enabled - used for external access
-	if [[ $ENABLE_FLOOD == "yes" || $ENABLE_FLOOD == "both" ]]; then
-		iptables -t mangle -A OUTPUT -p tcp --dport 3000 -j MARK --set-mark 3
-		iptables -t mangle -A OUTPUT -p tcp --sport 3000 -j MARK --set-mark 3
-	fi
-
 fi
 
 # accept output from rutorrent port 9080 - used for lan access
@@ -181,12 +168,6 @@ iptables -A OUTPUT -o "${docker_interface}" -p tcp --sport 9080 -j ACCEPT
 # accept output from rutorrent port 9443 - used for lan access
 iptables -A OUTPUT -o "${docker_interface}" -p tcp --dport 9443 -j ACCEPT
 iptables -A OUTPUT -o "${docker_interface}" -p tcp --sport 9443 -j ACCEPT
-
-# accept output from flood port 3000 if enabled - used for lan access
-if [[ $ENABLE_FLOOD == "yes" || $ENABLE_FLOOD == "both" ]]; then
-	iptables -A OUTPUT -o "${docker_interface}" -p tcp --dport 3000 -j ACCEPT
-	iptables -A OUTPUT -o "${docker_interface}" -p tcp --sport 3000 -j ACCEPT
-fi
 
 # process lan networks in the list
 for lan_network_item in "${lan_network_list[@]}"; do
@@ -209,6 +190,9 @@ iptables -A OUTPUT -p icmp --icmp-type echo-request -j ACCEPT
 
 # accept output from local loopback adapter
 iptables -A OUTPUT -o lo -j ACCEPT
+
+# accept output from tunnel adapter
+iptables -A OUTPUT -o "${VPN_DEVICE_TYPE}" -j ACCEPT
 
 echo "[info] iptables defined as follows..."
 echo "--------------------"
