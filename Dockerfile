@@ -38,9 +38,6 @@ VOLUME /config
 # map /data to host defined data path (used to store data from app)
 VOLUME /data
 
-# expose port for flood
-EXPOSE 3000
-
 # expose port for scgi
 EXPOSE 5000
 

@@ -32,11 +32,8 @@ echo 'set -g default-terminal "screen-256color"' > /home/nobody/.tmux.conf
 # pacman packages
 ####
 
-# flood currently requires nodejs v10 (package name nodejs-lts-dubnium), not v11 (package name nodejs) thus we force install of v10 before we proceed to install npm (dependency nodejs)
-pacman -S nodejs-lts-dubnium --needed --noconfirm
-
 # define pacman packages
-pacman_packages="git nginx php-fpm rsync openssl tmux mediainfo npm php-geoip unrar unzip libx264 libvpx xmlrpc-c sox python-pip"
+pacman_packages="git nginx php-fpm rsync openssl tmux mediainfo php-geoip unrar unzip libx264 libvpx xmlrpc-c sox python-pip"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
@@ -82,23 +79,8 @@ pacman -S --needed gcc --noconfirm
 # once psutil is compiled then remove gcc
 pacman -Ru gcc --noconfirm
 
-# github master branch - flood
+# github master branch - autodl-irssi
 ####
-
-# download flood ui for rtorrent
-/root/github.sh -df "github-download.zip" -dp "/tmp" -ep "/tmp/extracted" -ip "/etc/webapps/flood" -go "jfurrow" -gr "flood" -rt "source" -db "master"
-
-# flood requires make for npm packages
-pacman -S base-devel --needed --noconfirm
-
-# install npm package 'forever' - this is used to restart flood on crash
-npm install -g forever
-
-# run npm install -  note do not attempt to run 'npm run build' at this point as we need config.js
-cd "/etc/webapps/flood" && npm install
-
-# after flood install remove base devel excluding useful core packages
-pacman -Ru $(pacman -Qgq base-devel | grep -v awk | grep -v pacman | grep -v sed | grep -v grep | grep -v gzip | grep -v which) --noconfirm
 
 # download autodl-irssi community plugin
 /root/github.sh -df "github-download.zip" -dp "/tmp" -ep "/tmp/extracted" -ip "/usr/share/webapps/rutorrent/plugins/autodl-irssi" -go "autodl-community" -gr "autodl-rutorrent" -rt "source"
@@ -229,36 +211,11 @@ ln -s /usr/share/autodl-irssi/AutodlIrssi/ .
 cd /home/nobody/.irssi/scripts/autorun
 ln -s /usr/share/autodl-irssi/autodl-irssi.pl .
 
-# config - flood
-####
-
-flood_install_path="/etc/webapps/flood"
-
-# copy config template file
-cp "${flood_install_path}/config.template.js" "${flood_install_path}/config-backup.js"
-
-# modify template with connection details to rtorrent
-sed -i "s~host:.*~host: '127.0.0.1',~g" "${flood_install_path}/config-backup.js"
-
-# point key and cert at nginx (note ssl not enabled by default)
-sed -i "s~sslKey:.*~sslKey: '/config/nginx/certs/host.key',~g" "${flood_install_path}/config-backup.js"
-sed -i "s~sslCert:.*~sslCert: '/config/nginx/certs/host.cert',~g" "${flood_install_path}/config-backup.js"
-
-# set location of database (stores settings and user accounts)
-sed -i "s~dbPath:.*~dbPath: '/config/flood/db/',~g" "${flood_install_path}/config-backup.js"
-
-# set ip of host (talk on all ip's)
-sed -i "s~floodServerHost.*~floodServerHost: '0.0.0.0',~g" "${flood_install_path}/config-backup.js"
-
-# run npm build -  note we need to do this at this point as we need to have the modified config.js available for the build
-cp -f "${flood_install_path}/config-backup.js" "${flood_install_path}/config.js"
-cd "${flood_install_path}" && npm run build
-
 # container perms
 ####
 
 # define comma separated list of paths 
-install_paths="/etc/webapps,/usr/share/webapps,/usr/share/nginx/html,/etc/nginx,/etc/php,/run/php-fpm,/var/lib/nginx,/var/log/nginx,/etc/privoxy,/home/nobody,/etc/webapps/flood,/usr/share/autodl-irssi"
+install_paths="/usr/share/webapps,/usr/share/nginx/html,/etc/nginx,/etc/php,/run/php-fpm,/var/lib/nginx,/var/log/nginx,/etc/privoxy,/home/nobody,/usr/share/autodl-irssi"
 
 # split comma separated string into list for install paths
 IFS=',' read -ra install_paths_list <<< "${install_paths}"
@@ -503,14 +460,6 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 
 	export RUN_UP_SCRIPT="yes"
 
-fi
-
-export ENABLE_FLOOD=$(echo "${ENABLE_FLOOD}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-if [[ ! -z "${ENABLE_FLOOD}" ]]; then
-	echo "[info] ENABLE_FLOOD defined as '${ENABLE_FLOOD}'" | ts '%Y-%m-%d %H:%M:%.S'
-else
-	echo "[warn] ENABLE_FLOOD not defined (via -e ENABLE_FLOOD), defaulting to 'no'" | ts '%Y-%m-%d %H:%M:%.S'
-	export ENABLE_FLOOD="no"
 fi
 
 export ENABLE_AUTODL_IRSSI=$(echo "${ENABLE_AUTODL_IRSSI}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')

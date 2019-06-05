@@ -3,7 +3,6 @@
 [rTorrent-ps](https://github.com/pyroscope/rtorrent-ps)  
 [ruTorrent](https://github.com/Novik/ruTorrent)  
 [autodl-irssi](https://github.com/autodl-community/autodl-irssi)  
-[Flood](https://github.com/jfurrow/flood)  
 [OpenVPN](https://openvpn.net/)  
 [Privoxy](http://www.privoxy.org/)
 
@@ -15,7 +14,6 @@ rTorrent is a quick and efficient BitTorrent client that uses, and is in develop
 
 Latest stable rTorrent-ps release from Arch Linux AUR.
 Latest stable ruTorrent release from Arch Linux AUR.
-Latest GitHub commit to master branch for Flood.
 Latest stable OpenVPN release from Arch Linux repo.
 Latest stable Privoxy release from Arch Linux repo.
 
@@ -26,7 +24,6 @@ docker run -d \
     -p 9080:9080 \
     -p 9443:9443 \
     -p 8118:8118 \
-    -p 3000:3000 \
     --name=<container name> \
     -v <path for data files>:/data \
     -v <path for config files>:/config \
@@ -38,7 +35,6 @@ docker run -d \
     -e VPN_OPTIONS=<additional openvpn cli options> \
     -e STRICT_PORT_FORWARD=<yes|no> \
     -e ENABLE_PRIVOXY=<yes|no> \
-    -e ENABLE_FLOOD=<yes|no|both> \
     -e ENABLE_AUTODL_IRSSI=<yes|no> \
     -e ENABLE_RPC2=<yes|no> \
     -e ENABLE_RPC2_AUTH=<yes|no> \
@@ -65,12 +61,6 @@ or
 Username:- admin
 Password:- rutorrent
 
-**Access Flood (web ui)**
-
-`http://<host ip>:3000/`
-
-Note:- Requires user to enable Flood via container env var (ENABLE_FLOOD).
-
 **Access Privoxy**
 
 `http://<host ip>:8118`
@@ -82,7 +72,6 @@ docker run -d \
     -p 9080:9080 \
     -p 9443:9443 \
     -p 8118:8118 \
-    -p 3000:3000 \
     --name=rtorrentvpn \
     -v /root/docker/data:/data \
     -v /root/docker/config:/config \
@@ -93,7 +82,6 @@ docker run -d \
     -e VPN_PROV=pia \
     -e STRICT_PORT_FORWARD=yes \
     -e ENABLE_PRIVOXY=yes \
-    -e ENABLE_FLOOD=yes \
     -e ENABLE_AUTODL_IRSSI=yes \
     -e ENABLE_RPC2=yes \
     -e ENABLE_RPC2_AUTH=yes \
@@ -133,7 +121,6 @@ docker run -d \
     -p 9080:9080 \
     -p 9443:9443 \
     -p 8118:8118 \
-    -p 3000:3000 \
     --name=rtorrentvpn \
     -v /root/docker/data:/data \
     -v /root/docker/config:/config \
@@ -141,7 +128,6 @@ docker run -d \
     -e VPN_ENABLED=yes \
     -e VPN_PROV=airvpn \
     -e ENABLE_PRIVOXY=yes \
-    -e ENABLE_FLOOD=yes \
     -e ENABLE_AUTODL_IRSSI=yes \
     -e ENABLE_RPC2=yes \
     -e ENABLE_RPC2_AUTH=yes \
