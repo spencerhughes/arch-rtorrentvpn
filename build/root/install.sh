@@ -55,8 +55,11 @@ source /root/aur.sh
 # download rutorrent
 /root/github.sh -df github-rutorrent.zip -dp "/tmp" -ep "/tmp/extracted" -ip "/usr/share/webapps/rutorrent" -go "Novik" -gr "ruTorrent" -rt "source"
 
-# rutorrent plugin cloudflare requires python module 'CfScrape'
-pip install CfScrape
+# rutorrent plugin cloudflare requires python module 'CfScrape', use pip to install (python-pip = python 3.x)
+pip install --ignore-installed CfScrape
+
+# remove python-pip as 'update-to-head.sh' script picks up wrong version otherwise
+pacman -Ru python-pip --noconfirm
 
 # github release - pyrocore
 ####
@@ -497,6 +500,7 @@ rm /tmp/envvars_heredoc
 
 # cleanup
 yes|pacman -Scc
+pacman --noconfirm -Rns $(pacman -Qtdq) 2> /dev/null || true
 rm -rf /usr/share/locale/*
 rm -rf /usr/share/man/*
 rm -rf /usr/share/gtk-doc/*
