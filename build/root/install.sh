@@ -58,7 +58,7 @@ source /root/aur.sh
 # rutorrent plugin cloudflare requires python module 'CfScrape', use pip to install (python-pip = python 3.x)
 pip install --ignore-installed CfScrape
 
-# remove python-pip as 'update-to-head.sh' script picks up wrong version otherwise
+# remove python-pip to prevent confusion when using pyrocore pip on disk
 pacman -Ru python-pip --noconfirm
 
 # github release - pyrocore
@@ -71,7 +71,7 @@ git clone "https://github.com/pyroscope/pyrocore.git" "/opt/pyrocore" && cd "/op
 mkdir -p "/home/nobody/bin"
 
 # run install script which updates to github head and then installs python modules using pip
-./update-to-head.sh
+./update-to-head.sh "/usr/bin/python2"
 
 # install additional python modules using pip (pip laid on disk as part of pyrocore) - required
 # for pycore torque utility
