@@ -58,9 +58,6 @@ source /root/aur.sh
 # rutorrent plugin cloudflare requires python module 'CfScrape', use pip to install (python-pip = python 3.x)
 pip install --ignore-installed CfScrape
 
-# remove python-pip to prevent confusion when using pyrocore pip on disk
-pacman -Ru python-pip --noconfirm
-
 # github release - pyrocore
 ####
 
