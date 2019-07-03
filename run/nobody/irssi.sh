@@ -3,11 +3,6 @@
 # if autodl-irssi enabled then run, else log
 if [[ "${ENABLE_AUTODL_IRSSI}" == "yes" ]]; then
 
-	# run script to check ip is valid for tunnel device (will block until valid)
-	if [[ "${VPN_ENABLED}" == "yes" ]]; then
-		source /home/nobody/getvpnip.sh
-	fi
-
 	# change directory to script location and then run irssi via tmux
 	cd /home/nobody/.irssi/scripts/autorun
 
