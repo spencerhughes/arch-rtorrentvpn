@@ -13,7 +13,7 @@ curl --connect-timeout 5 --max-time 600 --retry 5 --retry-delay 0 --retry-max-ti
 unzip /tmp/scripts-master.zip -d /tmp
 
 # move shell scripts to /root
-mv /tmp/scripts-master/shell/arch/docker/*.sh /root/
+mv /tmp/scripts-master/shell/arch/docker/*.sh /usr/local/bin/
 
 # custom
 ####
@@ -21,7 +21,7 @@ mv /tmp/scripts-master/shell/arch/docker/*.sh /root/
 rtorrentps_package_name="rtorrent-ps.tar.xz"
 
 # download compiled rtorrent-ps (cannot compile during docker build)
-/root/curly.sh -rc 6 -rw 10 -of "/tmp/${rtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/rtorrent-ps-1.1.r38.gd52abd2-1-any.pkg.tar.xz"
+curly.sh -rc 6 -rw 10 -of "/tmp/${rtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/rtorrent-ps-1.1.r38.gd52abd2-1-any.pkg.tar.xz"
 
 # install rtorrent-ps with no dependencies (install libtorrent-ps using aur script)
 pacman -Udd "/tmp/${rtorrentps_package_name}" --noconfirm
@@ -47,13 +47,13 @@ fi
 aur_packages="libtorrent-ps autodl-irssi-community"
 
 # call aur install script (arch user repo) - note true required due to autodl-irssi error during install
-source /root/aur.sh
+source aur.sh
 
 # github release - rutorrent
 ####
 
 # download rutorrent
-/root/github.sh -df github-rutorrent.zip -dp "/tmp" -ep "/tmp/extracted" -ip "/usr/share/webapps/rutorrent" -go "Novik" -gr "ruTorrent" -rt "source"
+github.sh -df github-rutorrent.zip -dp "/tmp" -ep "/tmp/extracted" -ip "/usr/share/webapps/rutorrent" -go "Novik" -gr "ruTorrent" -rt "source"
 
 # rutorrent plugin cloudflare requires python module 'CfScrape', use pip to install (python-pip = python 3.x)
 pip install --ignore-installed CfScrape
@@ -83,10 +83,10 @@ pacman -Ru gcc --noconfirm
 ####
 
 # download autodl-irssi community plugin
-/root/github.sh -df "github-download.zip" -dp "/tmp" -ep "/tmp/extracted" -ip "/usr/share/webapps/rutorrent/plugins/autodl-irssi" -go "autodl-community" -gr "autodl-rutorrent" -rt "source"
+github.sh -df "github-download.zip" -dp "/tmp" -ep "/tmp/extracted" -ip "/usr/share/webapps/rutorrent/plugins/autodl-irssi" -go "autodl-community" -gr "autodl-rutorrent" -rt "source"
 
 # download htpasswd (problems with apache-tools and openssl 1.1.x)
-/root/curly.sh -rc 6 -rw 10 -of /tmp/htpasswd.tar.gz -url "https://github.com/binhex/arch-packages/raw/master/compiled/htpasswd.tar.gz"
+curly.sh -rc 6 -rw 10 -of /tmp/htpasswd.tar.gz -url "https://github.com/binhex/arch-packages/raw/master/compiled/htpasswd.tar.gz"
 
 # extract compiled version of htpasswd
 tar -xvf /tmp/htpasswd.tar.gz -C /
@@ -263,7 +263,7 @@ EOF
 sed -i '/# PERMISSIONS_PLACEHOLDER/{
     s/# PERMISSIONS_PLACEHOLDER//g
     r /tmp/permissions_heredoc
-}' /root/init.sh
+}' init.sh
 rm /tmp/permissions_heredoc
 
 # env vars
@@ -490,7 +490,7 @@ EOF
 sed -i '/# ENVVARS_PLACEHOLDER/{
     s/# ENVVARS_PLACEHOLDER//g
     r /tmp/envvars_heredoc
-}' /root/init.sh
+}' init.sh
 rm /tmp/envvars_heredoc
 
 # cleanup
