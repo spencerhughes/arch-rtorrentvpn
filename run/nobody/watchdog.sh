@@ -39,6 +39,15 @@ xmlrpc_connection="localhost:9080"
 rtorrent_port="49160"
 rtorrent_ip="0.0.0.0"
 
+# define sleep period between loops
+sleep_period_secs=30
+
+# define sleep period between incoming port checks
+sleep_period_incoming_port_secs=300
+
+# sleep period counter - used to limit number of hits to external website to check incoming port
+sleep_period_counter_secs=0
+
 # while loop to check ip and port
 while true; do
 
@@ -109,15 +118,13 @@ while true; do
 
 					if [[ "${rtorrent_running}" == "true" ]]; then
 
-						# run netcat to identify if port still open, use exit code
-						nc_exitcode=$(/usr/bin/nc -z -w 3 "${vpn_ip}" "${rtorrent_port}")
+						if [ "${sleep_period_counter_secs}" -ge "${sleep_period_incoming_port_secs}" ]; then
 
-						if [[ "${nc_exitcode}" -ne 0 ]]; then
+							# run script to check incoming port is accessible
+							source /home/nobody/checkextport.sh
 
-							echo "[info] rTorrent incoming port closed, marking for reconfigure"
-
-							# mark as reconfigure required due to mismatch
-							port_change="true"
+							# reset sleep period counter
+							sleep_period_counter_secs=0
 
 						fi
 
@@ -224,6 +231,9 @@ while true; do
 
 	fi
 
-	sleep 30s
+	# increment sleep period counter - used to limit number of hits to external website to check incoming port
+	sleep_period_counter_secs=$((sleep_period_counter_secs+"${sleep_period_secs}"))
+
+	sleep "${sleep_period_secs}"s
 
 done
