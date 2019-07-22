@@ -123,6 +123,11 @@ while true; do
 							# run script to check incoming port is accessible
 							source /home/nobody/checkextport.sh
 
+							# if return code from script is 1 then port is closed and needs reconfigure
+							if [[ "${?}" -eq 1 ]]; then
+								port_change="true"
+							fi
+
 							# reset sleep period counter
 							sleep_period_counter_secs=0
 
