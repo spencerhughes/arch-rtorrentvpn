@@ -43,7 +43,7 @@ rtorrent_ip="0.0.0.0"
 sleep_period_secs=30
 
 # define sleep period between incoming port checks
-sleep_period_incoming_port_secs=300
+sleep_period_incoming_port_secs=900
 
 # sleep period counter - used to limit number of hits to external website to check incoming port
 sleep_period_counter_secs=0
