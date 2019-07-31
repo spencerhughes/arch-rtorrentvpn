@@ -18,13 +18,21 @@ mv /tmp/scripts-master/shell/arch/docker/*.sh /usr/local/bin/
 # custom
 ####
 
+libtorrentps_package_name="libtorrent-ps.tar.xz"
+
+# download compiled libtorrent-ps (used by rtorrent-ps)
+curly.sh -rc 6 -rw 10 -of "/tmp/${libtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/libtorrent-ps.tar.xz"
+
+# install libtorrent-ps
+pacman -U "/tmp/${libtorrentps_package_name}" --noconfirm
+
 rtorrentps_package_name="rtorrent-ps.tar.xz"
 
 # download compiled rtorrent-ps (cannot compile during docker build)
-curly.sh -rc 6 -rw 10 -of "/tmp/${rtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/rtorrent-ps-1.1.r38.gd52abd2-1-any.pkg.tar.xz"
+curly.sh -rc 6 -rw 10 -of "/tmp/${rtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/rtorrent-ps.tar.xz"
 
-# install rtorrent-ps with no dependencies (install libtorrent-ps using aur script)
-pacman -Udd "/tmp/${rtorrentps_package_name}" --noconfirm
+# install rtorrent-ps
+pacman -U "/tmp/${rtorrentps_package_name}" --noconfirm
 
 # set tmux to use 256 colors (required by rtorrent-ps)
 echo 'set -g default-terminal "screen-256color"' > /home/nobody/.tmux.conf
@@ -44,7 +52,7 @@ fi
 ####
 
 # define aur packages
-aur_packages="libtorrent-ps autodl-irssi-community"
+aur_packages="autodl-irssi-community"
 
 # call aur install script (arch user repo) - note true required due to autodl-irssi error during install
 source aur.sh
