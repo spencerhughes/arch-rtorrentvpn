@@ -55,7 +55,8 @@ while true; do
 	rtorrent_running="false"
 	privoxy_running="false"
 	ip_change="false"
-	port_change="false"
+	vpn_port_change="false"
+	rtorrent_port_change="false"
 
 	if [[ "${VPN_ENABLED}" == "yes" ]]; then
 
@@ -112,7 +113,7 @@ while true; do
 					VPN_INCOMING_PORT="${rtorrent_port}"
 
 					# ignore port change as we cannot detect new port
-					port_change="false"
+					rtorrent_port_change="false"
 
 				else
 
@@ -135,7 +136,7 @@ while true; do
 						echo "[info] rTorrent incoming port $rtorrent_port and VPN incoming port ${VPN_INCOMING_PORT} different, marking for reconfigure"
 
 						# mark as reconfigure required due to mismatch
-						port_change="true"
+						rtorrent_port_change="true"
 
 					fi
 
@@ -143,7 +144,7 @@ while true; do
 
 			fi
 
-			if [[ "${ip_change}" == "true" || "${rtorrent_running}" == "false" ]]; then
+			if [[ "${rtorrent_port_change}" == "true" || "${ip_change}" == "true" || "${rtorrent_running}" == "false" ]]; then
 
 				# run script to start rtorrent, it can also perform shutdown of rtorrent if its already running (required for port/ip change)
 				source /home/nobody/rtorrent.sh
@@ -161,10 +162,10 @@ while true; do
 
 			fi
 
-			if [[ "${port_change}" == "true" ]];then
+			# if port is detected as closed then create empty file to trigger restart of openvpn process (restart code in /root/openvpn.sh)
+			if [[ "${vpn_port_change}" == "true" ]];then
 
-				echo "[info] Sending SIGTERM (-15) to 'openvpn' due to port closed..."
-				pkill -SIGTERM "openvpn"
+				touch "/tmp/portclosed"
 
 			fi
 
