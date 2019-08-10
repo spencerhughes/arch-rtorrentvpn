@@ -143,7 +143,7 @@ while true; do
 
 			fi
 
-			if [[ "${port_change}" == "true" || "${ip_change}" == "true" || "${rtorrent_running}" == "false" ]]; then
+			if [[ "${ip_change}" == "true" || "${rtorrent_running}" == "false" ]]; then
 
 				# run script to start rtorrent, it can also perform shutdown of rtorrent if its already running (required for port/ip change)
 				source /home/nobody/rtorrent.sh
@@ -158,6 +158,13 @@ while true; do
 
 				# run script to initialise rutorrent plugins
 				source /home/nobody/initplugins.sh
+
+			fi
+
+			if [[ "${port_change}" == "true" ]];then
+
+				echo "[info] Sending SIGTERM (-15) to 'openvpn' due to port closed..."
+				pkill -SIGTERM "openvpn"
 
 			fi
 
