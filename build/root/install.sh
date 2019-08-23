@@ -41,7 +41,7 @@ echo 'set -g default-terminal "screen-256color"' > /home/nobody/.tmux.conf
 ####
 
 # define pacman packages
-pacman_packages="git nginx php-fpm rsync openssl tmux mediainfo php-geoip unrar unzip libx264 libvpx xmlrpc-c sox python2 python-pip"
+pacman_packages="git nginx php-fpm rsync openssl tmux mediainfo php-geoip libx264 libvpx xmlrpc-c sox python2 python-pip"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
