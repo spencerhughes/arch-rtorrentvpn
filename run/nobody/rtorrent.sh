@@ -9,13 +9,17 @@ if [[ "${rtorrent_running}" == "true" ]]; then
 	# SIGTERM used here as SIGINT does not kill the process
 	pkill -SIGTERM "tmux\: server"
 
-	# make sure 'rtorrent main' process DOESNT exist before re-starting
-	while pgrep -x "rtorrent main" &> /dev/null
-	do
-
-		sleep 0.5s
-
+	echo "[info] Waiting until 'rtorrent main' process has exited..."
+	while pgrep -x "rtorrent main" &> /dev/null; do
+		sleep 0.1s
 	done
+	echo "[info] Process 'rtorrent main' exited"
+
+	echo "[info] Waiting for rtorrent port 5000 to not be in 'listen' state..."
+	while [[ $(netstat -lnt | awk '$6 == "LISTEN" && $4 ~ ".5000"') != "" ]]; do
+		sleep 0.1
+	done
+	echo "[info] Port 5000 not listening"
 
 fi
 
