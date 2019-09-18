@@ -492,6 +492,8 @@ else
 	export ENABLE_RPC2_AUTH="yes"
 fi
 
+export APPLICATION="rtorrent"
+
 EOF
 
 # replace env vars placeholder string with contents of file (here doc)
