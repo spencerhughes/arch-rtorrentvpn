@@ -27,7 +27,7 @@ sed -i -e 's~peer_exchange = no~protocol.pex.set = no~g' "${rtorrent_config}"
 sed -i '/system.file_allocate.set/d' "${rtorrent_config}"
 
 # force unix line endings conversion in case user edited rtorrent.rc with notepad
-/usr/bin/dos2unix "${rtorrent_config}"
+/usr/local/bin/dos2unix.sh "${rtorrent_config}"
 
 # create soft link to rtorrent config file
 ln -fs "${rtorrent_config}" ~/.rtorrent.rc
