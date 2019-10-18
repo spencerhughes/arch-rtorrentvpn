@@ -501,16 +501,14 @@ if [[ $ENABLE_RPC2_AUTH == "yes" ]]; then
 		export RPC2_USER="admin"
 	fi
 
-	export RPC_PASS=$(echo "${RPC_PASS}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-	if [[ ! -z "${RPC_PASS}" ]]; then
-		echo "[info] RPC_PASS defined as '${RPC_PASS}'" | ts '%Y-%m-%d %H:%M:%.S'
+	export RPC2_PASS=$(echo "${RPC2_PASS}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+	if [[ ! -z "${RPC2_PASS}" ]]; then
+		echo "[info] RPC2_PASS defined as '${RPC2_PASS}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
-		echo "[warn] RPC_PASS not defined (via -e RPC_PASS), defaulting to 'rutorrent'" | ts '%Y-%m-%d %H:%M:%.S'
-		export RPC_PASS="rutorrent"
+		echo "[warn] RPC2_PASS not defined (via -e RPC2_PASS), defaulting to 'rutorrent'" | ts '%Y-%m-%d %H:%M:%.S'
+		export RPC2_PASS="rutorrent"
 	fi
 
-	echo "[info] Setting RPC username and password..." | ts '%Y-%m-%d %H:%M:%.S'
-	/usr/bin/htpasswd -b -c /config/nginx/security/auth "${RPC2_USER}" "${RPC_PASS}"
 fi
 
 export APPLICATION="rtorrent"

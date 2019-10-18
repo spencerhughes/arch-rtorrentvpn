@@ -1,27 +1,53 @@
 #!/bin/bash
 
-# function to enable rpc2 with or without authentication
-function enable_rpc {
+# function to enable/disable authentication for rpc2 and webui (/)
+function nginx_auth {
 
-if [[ $1 == "enable_auth" ]]; then
+ENABLE_AUTH="${1}"
+auth_file="${2}"
+location="${3}"
 
-# inserts /rpc2 location (basic auth) into existing nginx.conf
-sed -i 's~# include scgi for rtorent.*~# include scgi for rtorent\
-        location /RPC2 {\
+if [[ "${location}" == "/RPC2" ]]; then
+
+	if [[ "${ENABLE_AUTH}" == "yes" ]]; then
+
+		# inserts location (basic auth) into existing nginx.conf
+		sed -i "s~location ${location} {~location ${location} {\
             include scgi_params;\
             scgi_pass 127.0.0.1:5000;\
-            auth_basic "Restricted Content";\
-            auth_basic_user_file /config/nginx/security/auth;\
-        }~g' /config/nginx/config/nginx.conf
+            auth_basic \"Restricted Content\";\
+            auth_basic_user_file ${auth_file};\
+        }~g" '/config/nginx/config/nginx.conf'
+
+	else
+
+		# inserts location (no auth) into existing nginx.conf
+		sed -i "s~location ${location} {~location ${location} {\
+            include scgi_params;\
+            scgi_pass 127.0.0.1:5000;\
+        }~g" '/config/nginx/config/nginx.conf'
+
+	fi
 
 else
 
-# inserts /rpc2 location (no auth) into existing nginx.conf
-sed -i 's~# include scgi for rtorent.*~# include scgi for rtorent\
-        location /RPC2 {\
-            include scgi_params;\
-            scgi_pass 127.0.0.1:5000;\
-        }~g' /config/nginx/config/nginx.conf
+	if [[ "${ENABLE_AUTH}" == "yes" ]]; then
+
+		# inserts location (basic auth) into existing nginx.conf
+		sed -i "s~location ${location} {~location ${location} {\
+            index index.html index.htm index.php;\
+            auth_basic \"Restricted Content\";\
+            auth_basic_user_file ${auth_file};\
+        }~g" '/config/nginx/config/nginx.conf'
+
+	else
+
+		# inserts location (no auth) into existing nginx.conf
+		sed -i "s~location ${location} {~location ${location} {\
+            index index.html index.htm index.php;\
+        }~g" '/config/nginx/config/nginx.conf'
+
+	fi
 
 fi
 
@@ -221,21 +247,26 @@ if [[ "${ENABLE_RPC2}" == "yes" ]]; then
 	# if rpc authentication enabled then add in lines
 	if [[ "${ENABLE_RPC2_AUTH}" == "yes" ]]; then
 
+		auth_file="/config/nginx/security/rpc2_auth"
+
 		# check rpc2 is secure
-		check_rpc2_secure=$(awk '/location \/RPC2 {/,/\}/' /config/nginx/config/nginx.conf | xargs -0 | grep -ioP 'auth_basic "Restricted Content";')
+		check_rpc2_secure=$(awk '/location \/RPC2 {/,/\}/' /config/nginx/config/nginx.conf | xargs -0 | grep -ioP "auth_basic_user_file ${auth_file};")
 
 		if [[ -z "${check_rpc2_secure}" ]]; then
 
 			echo "[info] enabling basic auth for /rpc2..."
 
 			# delete existing /rpc2 location (cannot easily edit and replace lines without insertion)
-			sed -i '/location \/RPC2/,/}/d' "/config/nginx/config/nginx.conf"
+			sed -i '/location \/RPC2/,/}/{//!d}' "/config/nginx/config/nginx.conf"
 
 			# call function to enable authentication for rpc2
-			enable_rpc "enable_auth"
+			nginx_auth "${ENABLE_RPC2_AUTH}" "${auth_file}" "/RPC2"
 
 		fi
-	
+
+		echo "[info] Setting RPC2 username and password..."
+		/usr/bin/htpasswd -b -c "${auth_file}" "${RPC2_USER}" "${RPC2_PASS}"
+
 	else
 
 		# check rpc2 is defined
@@ -246,10 +277,10 @@ if [[ "${ENABLE_RPC2}" == "yes" ]]; then
 			echo "[info] disabling basic auth for /rpc2..."
 
 			# delete existing /rpc2 location (cannot easily edit and replace lines without insertion)
-			sed -i '/location \/RPC2/,/}/d' "/config/nginx/config/nginx.conf"
+			sed -i '/location \/RPC2/,/}/{//!d}' "/config/nginx/config/nginx.conf"
 
 			# call function to disable authentication for rpc2
-			enable_rpc "disable_auth"
+			nginx_auth "${ENABLE_RPC2_AUTH}" "" "/RPC2"
 
 		fi
 
@@ -260,7 +291,49 @@ else
 	echo "[info] nginx /rpc2 location not enabled"
 
 	# delete existing /rpc2 location
-	sed -i '/location \/RPC2/,/}/d' "/config/nginx/config/nginx.conf"
+	sed -i '/location \/RPC2/,/}/{//!d}' "/config/nginx/config/nginx.conf"
+
+fi
+
+# if web ui authentication enabled then add in lines
+if [[ "${ENABLE_WEBUI_AUTH}" == "yes" ]]; then
+
+	auth_file="/config/nginx/security/webui_auth"
+
+	# check web ui (/) is secure
+	check_webui_secure=$(awk '/location \/ {/,/\}/' /config/nginx/config/nginx.conf | xargs -0 | grep -ioP "auth_basic_user_file ${auth_file};")
+
+	if [[ -z "${check_webui_secure}" ]]; then
+
+		echo "[info] enabling basic auth for web ui..."
+
+		# delete existing / location (cannot easily edit and replace lines without insertion)
+		sed -i '/location \//,/}/d' "/config/nginx/config/nginx.conf"
+
+		# call function to enable authentication for web ui
+		nginx_auth "${ENABLE_WEBUI_AUTH}" "${auth_file}" "/"
+
+	fi
+
+	echo "[info] Setting RPC2 username and password..."
+	/usr/bin/htpasswd -b -c "${auth_file}" "${RPC2_USER}" "${RPC2_PASS}"
+
+else
+
+	# check web ui is defined
+	check_rpc2_defined=$(awk '/location \/ {/,/\}/' /config/nginx/config/nginx.conf | xargs -0 | grep -ioP 'scgi_pass 127.0.0.1:5000;')
+
+	if [[ -z "${check_rpc2_defined}" ]]; then
+
+		echo "[info] disabling basic auth for web ui..."
+
+		# delete existing web ui location (/) (cannot easily edit and replace lines without insertion)
+		sed -i '/location \//,/}/d' "/config/nginx/config/nginx.conf"
+
+		# call function to disable authentication for web ui
+		nginx_auth "${ENABLE_WEBUI_AUTH}" "" "/"
+
+	fi
 
 fi
 
