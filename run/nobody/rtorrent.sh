@@ -3,55 +3,60 @@
 # kill rtorrent (required due to the fact rtorrent cannot cope with dynamic changes to port)
 if [[ "${rtorrent_running}" == "true" ]]; then
 
-	# note its not currently possible to change port and/or ip address whilst running, thus the sigterm
-	echo "[info] Sending SIGTERM (-15) to 'tmux: server' (will terminate rtorrent) due to port/ip change..."
-
-	# SIGTERM used here as SIGINT does not kill the process
-	pkill -SIGTERM "tmux\: server"
-
-	echo "[info] Waiting until 'rtorrent main' process has exited..."
-	while pgrep -x "rtorrent main" &> /dev/null; do
-		sleep 0.1s
-	done
-	echo "[info] Process 'rtorrent main' exited"
-
-	echo "[info] Waiting for rtorrent port 5000 to not be in 'listen' state..."
-	while [[ $(netstat -lnt | awk '$6 == "LISTEN" && $4 ~ ".5000"') != "" ]]; do
-		sleep 0.1
-	done
-	echo "[info] Port 5000 not listening"
-
-fi
-
-echo "[info] Removing any rTorrent session lock files left over from the previous run..."
-rm -f /config/rtorrent/session/*.lock
-
-echo "[info] Attempting to start rTorrent..."
-
-if [[ "${VPN_ENABLED}" == "yes" ]]; then
-
-	if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
-
-		# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface and port
-		/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -p ${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT} -o ip=${external_ip} -o dht_port=${VPN_INCOMING_PORT}"
-
-		# set rtorrent port to current vpn port (used when checking for changes on next run)
-		rtorrent_port="${VPN_INCOMING_PORT}"
-
+	if [[ "${ENABLE_RPC2_AUTH}" == "yes" ]]; then
+		xmlrpc_connection="localhost:9080 -username=${RPC2_USER} -password=${RPC2_PASS}"
 	else
-
-		# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface
-		/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -o ip=${external_ip}"
-
+		xmlrpc_connection="localhost:9080"
 	fi
 
-	# set rtorrent ip to current vpn ip (used when checking for changes on next run)
-	rtorrent_ip="${vpn_ip}"
+	# note 'i/0' is required? (integer) as first parameter for subsequent xmlrpc commands
+
+	# set new value for incoming port
+	xmlrpc ${xmlrpc_connection} network.port_range.set 'i/0' "${VPN_INCOMING_PORT}-{VPN_INCOMING_PORT}"
+
+	# set new value for bind to vpn tunnel ip
+	# note this must come AFTER the port has been changed, otherwise the port change does not take effect
+	xmlrpc ${xmlrpc_connection} network.bind_address.set 'i/0' "${vpn_ip}"
+
+	# set new value for ip address sent to tracker
+	xmlrpc ${xmlrpc_connection} network.local_address.set 'i/0' "${external_ip}"
+
+	# set new value for dht port (same as incoming port)
+	xmlrpc ${xmlrpc_connection} dht.port.set 'i/0' "${VPN_INCOMING_PORT}"
 
 else
 
-	# run tmux attached to rTorrent (daemonized, non-blocking)
-	/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent"
+	echo "[info] Removing any rTorrent session lock files left over from the previous run..."
+	rm -f /config/rtorrent/session/*.lock
+
+	echo "[info] Attempting to start rTorrent..."
+
+	if [[ "${VPN_ENABLED}" == "yes" ]]; then
+
+		if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
+
+			# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface and port
+			/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -p ${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT} -o ip=${external_ip} -o dht_port=${VPN_INCOMING_PORT}"
+
+			# set rtorrent port to current vpn port (used when checking for changes on next run)
+			rtorrent_port="${VPN_INCOMING_PORT}"
+
+		else
+
+			# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface
+			/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -o ip=${external_ip}"
+
+		fi
+
+		# set rtorrent ip to current vpn ip (used when checking for changes on next run)
+		rtorrent_ip="${vpn_ip}"
+
+	else
+
+		# run tmux attached to rTorrent (daemonized, non-blocking)
+		/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent"
+
+	fi
 
 fi
 
