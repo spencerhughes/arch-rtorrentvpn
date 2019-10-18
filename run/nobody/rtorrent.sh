@@ -9,6 +9,9 @@ if [[ "${rtorrent_running}" == "true" ]]; then
 		xmlrpc_connection="localhost:9080"
 	fi
 
+	# useful for debug and finding valid methods
+	#xmlrpc ${xmlrpc_connection} system.listMethods
+
 	# note 'i/0' is required? (integer) as first parameter for subsequent xmlrpc commands
 
 	# set new value for incoming port
