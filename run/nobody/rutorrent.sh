@@ -11,21 +11,19 @@ if [[ "${location}" == "/RPC2" ]]; then
 
 	if [[ "${ENABLE_AUTH}" == "yes" ]]; then
 
-		# inserts location (basic auth) into existing nginx.conf
-		sed -i "s~location ${location} {~location ${location} {\
-            include scgi_params;\
-            scgi_pass 127.0.0.1:5000;\
-            auth_basic \"Restricted Content\";\
-            auth_basic_user_file ${auth_file};\
-        }~g" '/config/nginx/config/nginx.conf'
+            # inserts location (basic auth) into existing nginx.conf
+            sed -i "s~location ${location} {~location ${location} {\\
+            include scgi_params;\\
+            scgi_pass 127.0.0.1:5000;\\
+            auth_basic \"Restricted Content\";\\
+            auth_basic_user_file ${auth_file};~g" '/config/nginx/config/nginx.conf'
 
 	else
 
-		# inserts location (no auth) into existing nginx.conf
-		sed -i "s~location ${location} {~location ${location} {\
-            include scgi_params;\
-            scgi_pass 127.0.0.1:5000;\
-        }~g" '/config/nginx/config/nginx.conf'
+            # inserts location (no auth) into existing nginx.conf
+            sed -i "s~location ${location} {~location ${location} {\\
+            include scgi_params;\\
+            scgi_pass 127.0.0.1:5000;~g" '/config/nginx/config/nginx.conf'
 
 	fi
 
@@ -33,19 +31,17 @@ else
 
 	if [[ "${ENABLE_AUTH}" == "yes" ]]; then
 
-		# inserts location (basic auth) into existing nginx.conf
-		sed -i "s~location ${location} {~location ${location} {\
-            index index.html index.htm index.php;\
-            auth_basic \"Restricted Content\";\
-            auth_basic_user_file ${auth_file};\
-        }~g" '/config/nginx/config/nginx.conf'
+            # inserts location (basic auth) into existing nginx.conf
+            sed -i "s~location ${location} {~location ${location} {\\
+            index index.html index.htm index.php;\\
+            auth_basic \"Restricted Content\";\\
+            auth_basic_user_file ${auth_file};~g" '/config/nginx/config/nginx.conf'
 
 	else
 
-		# inserts location (no auth) into existing nginx.conf
-		sed -i "s~location ${location} {~location ${location} {\
-            index index.html index.htm index.php;\
-        }~g" '/config/nginx/config/nginx.conf'
+            # inserts location (no auth) into existing nginx.conf
+            sed -i "s~location ${location} {~location ${location} {\\
+            index index.html index.htm index.php;~g" '/config/nginx/config/nginx.conf'
 
 	fi
 
@@ -244,13 +240,13 @@ if [[ "${ENABLE_RPC2}" == "yes" ]]; then
 
 	echo "[info] nginx /rpc2 location enabled"
 
+	# check if rpc2 is secure
+	check_rpc2_secure=$(awk '/location \/RPC2 {/,/\}/' /config/nginx/config/nginx.conf | xargs -0 | grep -ioP "auth_basic_user_file ${auth_file};")
+
 	# if rpc authentication enabled then add in lines
 	if [[ "${ENABLE_RPC2_AUTH}" == "yes" ]]; then
 
 		auth_file="/config/nginx/security/rpc2_auth"
-
-		# check rpc2 is secure
-		check_rpc2_secure=$(awk '/location \/RPC2 {/,/\}/' /config/nginx/config/nginx.conf | xargs -0 | grep -ioP "auth_basic_user_file ${auth_file};")
 
 		if [[ -z "${check_rpc2_secure}" ]]; then
 
@@ -269,10 +265,7 @@ if [[ "${ENABLE_RPC2}" == "yes" ]]; then
 
 	else
 
-		# check rpc2 is defined
-		check_rpc2_defined=$(awk '/location \/RPC2 {/,/\}/' /config/nginx/config/nginx.conf | xargs -0 | grep -ioP 'scgi_pass 127.0.0.1:5000;')
-
-		if [[ -z "${check_rpc2_defined}" ]]; then
+		if [[ -n "${check_rpc2_secure}" ]]; then
 
 			echo "[info] disabling basic auth for /rpc2..."
 
@@ -315,15 +308,12 @@ if [[ "${ENABLE_WEBUI_AUTH}" == "yes" ]]; then
 
 	fi
 
-	echo "[info] Setting RPC2 username and password..."
-	/usr/bin/htpasswd -b -c "${auth_file}" "${RPC2_USER}" "${RPC2_PASS}"
+	echo "[info] Setting web ui username and password..."
+	/usr/bin/htpasswd -b -c "${auth_file}" "${WEBUI_USER}" "${WEBUI_PASS}"
 
 else
 
-	# check web ui is defined
-	check_rpc2_defined=$(awk '/location \/ {/,/\}/' /config/nginx/config/nginx.conf | xargs -0 | grep -ioP 'scgi_pass 127.0.0.1:5000;')
-
-	if [[ -z "${check_rpc2_defined}" ]]; then
+	if [[ -n "${check_webui_secure}" ]]; then
 
 		echo "[info] disabling basic auth for web ui..."
 
