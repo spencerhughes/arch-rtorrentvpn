@@ -308,7 +308,7 @@ if [[ "${ENABLE_WEBUI_AUTH}" == "yes" ]]; then
 		echo "[info] enabling basic auth for web ui..."
 
 		# delete existing / location (cannot easily edit and replace lines without insertion)
-		sed -i '/location \//,/}/d' "/config/nginx/config/nginx.conf"
+		sed -i '/location \//,/}/{//!d}' "/config/nginx/config/nginx.conf"
 
 		# call function to enable authentication for web ui
 		nginx_auth "${ENABLE_WEBUI_AUTH}" "${auth_file}" "/"
@@ -328,7 +328,7 @@ else
 		echo "[info] disabling basic auth for web ui..."
 
 		# delete existing web ui location (/) (cannot easily edit and replace lines without insertion)
-		sed -i '/location \//,/}/d' "/config/nginx/config/nginx.conf"
+		sed -i '/location \//,/}/{//!d}' "/config/nginx/config/nginx.conf"
 
 		# call function to disable authentication for web ui
 		nginx_auth "${ENABLE_WEBUI_AUTH}" "" "/"
