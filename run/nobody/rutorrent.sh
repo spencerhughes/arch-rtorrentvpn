@@ -9,7 +9,7 @@ location="${3}"
 
 if [[ "${location}" == "/RPC2" ]]; then
 
-	if [[ "${ENABLE_AUTH}" == "yes" ]]; then
+    if [[ "${ENABLE_AUTH}" == "yes" ]]; then
 
             # inserts location (basic auth) into existing nginx.conf
             sed -i "s~location ${location} {~location ${location} {\\
@@ -18,18 +18,18 @@ if [[ "${location}" == "/RPC2" ]]; then
             auth_basic \"Restricted Content\";\\
             auth_basic_user_file ${auth_file};~g" '/config/nginx/config/nginx.conf'
 
-	else
+    else
 
             # inserts location (no auth) into existing nginx.conf
             sed -i "s~location ${location} {~location ${location} {\\
             include scgi_params;\\
             scgi_pass 127.0.0.1:5000;~g" '/config/nginx/config/nginx.conf'
 
-	fi
+    fi
 
 else
 
-	if [[ "${ENABLE_AUTH}" == "yes" ]]; then
+    if [[ "${ENABLE_AUTH}" == "yes" ]]; then
 
             # inserts location (basic auth) into existing nginx.conf
             sed -i "s~location ${location} {~location ${location} {\\
@@ -37,13 +37,13 @@ else
             auth_basic \"Restricted Content\";\\
             auth_basic_user_file ${auth_file};~g" '/config/nginx/config/nginx.conf'
 
-	else
+    else
 
             # inserts location (no auth) into existing nginx.conf
             sed -i "s~location ${location} {~location ${location} {\\
             index index.html index.htm index.php;~g" '/config/nginx/config/nginx.conf'
 
-	fi
+    fi
 
 fi
 
@@ -240,13 +240,13 @@ if [[ "${ENABLE_RPC2}" == "yes" ]]; then
 
 	echo "[info] nginx /rpc2 location enabled"
 
+	auth_file="/config/nginx/security/rpc2_auth"
+
 	# check if rpc2 is secure
 	check_rpc2_secure=$(awk '/location \/RPC2 {/,/\}/' /config/nginx/config/nginx.conf | xargs -0 | grep -ioP "auth_basic_user_file ${auth_file};")
 
 	# if rpc authentication enabled then add in lines
 	if [[ "${ENABLE_RPC2_AUTH}" == "yes" ]]; then
-
-		auth_file="/config/nginx/security/rpc2_auth"
 
 		if [[ -z "${check_rpc2_secure}" ]]; then
 
