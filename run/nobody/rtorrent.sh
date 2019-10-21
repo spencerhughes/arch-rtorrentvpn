@@ -15,11 +15,17 @@ if [[ "${rtorrent_running}" == "true" ]]; then
 	# note 'i/0' is required? (integer) as first parameter for subsequent xmlrpc commands
 
 	# set new value for incoming port
-	xmlrpc ${xmlrpc_connection} network.port_range.set 'i/0' "${VPN_INCOMING_PORT}-{VPN_INCOMING_PORT}"
+	if xmlrpc ${xmlrpc_connection} network.port_range.set 'i/0' "${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT}"; then
+		# set rtorrent port to current vpn port (used when checking for changes on next run)
+		rtorrent_port="${VPN_INCOMING_PORT}"
+	fi
 
 	# set new value for bind to vpn tunnel ip
 	# note this must come AFTER the port has been changed, otherwise the port change does not take effect
-	xmlrpc ${xmlrpc_connection} network.bind_address.set 'i/0' "${vpn_ip}"
+	if xmlrpc ${xmlrpc_connection} network.bind_address.set 'i/0' "${vpn_ip}"; then
+		# set rtorrent ip to current vpn ip (used when checking for changes on next run)
+		rtorrent_ip="${vpn_ip}"
+	fi
 
 	# set new value for ip address sent to tracker
 	xmlrpc ${xmlrpc_connection} network.local_address.set 'i/0' "${external_ip}"
@@ -61,44 +67,44 @@ else
 
 	fi
 
-fi
+	# make sure process rtorrent DOES exist
+	retry_count=30
+	while true; do
 
-# make sure process rtorrent DOES exist
-retry_count=30
-while true; do
+		if ! pgrep -x "rtorrent main" > /dev/null; then
 
-	if ! pgrep -x "rtorrent main" > /dev/null; then
+			retry_count=$((retry_count-1))
+			if [ "${retry_count}" -eq "0" ]; then
 
-		retry_count=$((retry_count-1))
-		if [ "${retry_count}" -eq "0" ]; then
+				echo "[warn] Wait for rTorrent process to start aborted, too many retries"
+				echo "[warn] Showing output from command before exit..."
+				timeout 10 /usr/bin/rtorrent -b "${vpn_ip}" -o ip="${external_ip}" ; exit 1
 
-			echo "[warn] Wait for rTorrent process to start aborted, too many retries"
-			echo "[warn] Showing output from command before exit..."
-			timeout 10 /usr/bin/rtorrent -b "${vpn_ip}" -o ip="${external_ip}" ; exit 1
+			else
+
+				if [[ "${DEBUG}" == "true" ]]; then
+					echo "[debug] Waiting for rTorrent process to start..."
+				fi
+
+				sleep 1s
+
+			fi
 
 		else
 
-			if [[ "${DEBUG}" == "true" ]]; then
-				echo "[debug] Waiting for rTorrent process to start..."
-			fi
-
-			sleep 1s
+			echo "[info] rTorrent process started"
+			break
 
 		fi
 
-	else
+	done
 
-		echo "[info] rTorrent process started"
-		break
+	echo "[info] Waiting for rTorrent process to start listening on port 5000..."
 
-	fi
+	while [[ $(netstat -lnt | awk '$6 == "LISTEN" && $4 ~ ".5000"') == "" ]]; do
+		sleep 0.1
+	done
 
-done
+	echo "[info] rTorrent process listening on port 5000"
 
-echo "[info] Waiting for rTorrent process to start listening on port 5000..."
-
-while [[ $(netstat -lnt | awk '$6 == "LISTEN" && $4 ~ ".5000"') == "" ]]; do
-	sleep 0.1
-done
-
-echo "[info] rTorrent process listening on port 5000"
+fi
