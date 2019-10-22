@@ -38,6 +38,11 @@ docker run -d \
     -e ENABLE_AUTODL_IRSSI=<yes|no> \
     -e ENABLE_RPC2=<yes|no> \
     -e ENABLE_RPC2_AUTH=<yes|no> \
+    -e ENABLE_WEBUI_AUTH=<yes|no> \
+    -e RPC2_USER=<rpc2 username> \
+    -e RPC2_PASS=<rpc2 password> \
+    -e WEBUI_USER=<webui username> \
+    -e WEBUI_PASS=<webui password> \
     -e LAN_NETWORK=<lan ipv4 network>/<cidr notation> \
     -e NAME_SERVERS=<name server ip(s)> \
     -e DEBUG=<true|false> \
@@ -58,8 +63,8 @@ or
 
 `https://<host ip>:9443/`
 
-Username:- admin
-Password:- rutorrent
+Username:- <webui username>
+Password:- <webui password>
 
 **Access Privoxy**
 
@@ -85,6 +90,11 @@ docker run -d \
     -e ENABLE_AUTODL_IRSSI=yes \
     -e ENABLE_RPC2=yes \
     -e ENABLE_RPC2_AUTH=yes \
+    -e ENABLE_WEBUI_AUTH=yes \
+    -e RPC2_USER=admin \
+    -e RPC2_PASS=rutorrent \
+    -e WEBUI_USER=admin \
+    -e WEBUI_PASS=rutorrent \
     -e LAN_NETWORK=192.168.1.0/24 \
     -e NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1 \
     -e DEBUG=false \
@@ -131,6 +141,11 @@ docker run -d \
     -e ENABLE_AUTODL_IRSSI=yes \
     -e ENABLE_RPC2=yes \
     -e ENABLE_RPC2_AUTH=yes \
+    -e ENABLE_WEBUI_AUTH=yes \
+    -e RPC2_USER=admin \
+    -e RPC2_PASS=rutorrent \
+    -e WEBUI_USER=admin \
+    -e WEBUI_PASS=rutorrent \
     -e LAN_NETWORK=192.168.1.0/24 \
     -e NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1 \
     -e DEBUG=false \
