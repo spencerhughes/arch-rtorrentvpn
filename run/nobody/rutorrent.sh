@@ -262,17 +262,13 @@ if [[ "${ENABLE_RPC2}" == "yes" ]]; then
 
 	else
 
-		if [[ -n "${check_rpc2_secure}" ]]; then
+		echo "[info] disabling basic auth for /rpc2..."
 
-			echo "[info] disabling basic auth for /rpc2..."
+		# delete existing /rpc2 location (cannot easily edit and replace lines without insertion)
+		sed -i -r '/location \/RPC2\s/,/}/{//!d}' "/config/nginx/config/nginx.conf"
 
-			# delete existing /rpc2 location (cannot easily edit and replace lines without insertion)
-			sed -i -r '/location \/RPC2\s/,/}/{//!d}' "/config/nginx/config/nginx.conf"
-
-			# call function to disable authentication for rpc2
-			nginx_auth "${ENABLE_RPC2_AUTH}" "" "/RPC2"
-
-		fi
+		# call function to disable authentication for rpc2
+		nginx_auth "${ENABLE_RPC2_AUTH}" "" "/RPC2"
 
 	fi
 
@@ -321,17 +317,13 @@ if [[ "${ENABLE_WEBUI_AUTH}" == "yes" ]]; then
 
 else
 
-	if [[ -n "${check_webui_secure}" ]]; then
+	echo "[info] disabling basic auth for web ui..."
 
-		echo "[info] disabling basic auth for web ui..."
+	# delete existing web ui location (/) (cannot easily edit and replace lines without insertion)
+	sed -i -r '/location \/\s/,/}/{//!d}' "/config/nginx/config/nginx.conf"
 
-		# delete existing web ui location (/) (cannot easily edit and replace lines without insertion)
-		sed -i -r '/location \/\s/,/}/{//!d}' "/config/nginx/config/nginx.conf"
-
-		# call function to disable authentication for web ui
-		nginx_auth "${ENABLE_WEBUI_AUTH}" "" "/"
-
-	fi
+	# call function to disable authentication for web ui
+	nginx_auth "${ENABLE_WEBUI_AUTH}" "" "/"
 
 fi
 
