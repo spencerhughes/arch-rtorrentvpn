@@ -100,20 +100,6 @@ else
 
 fi
 
-# if nginx security file doesnt exist then copy default to host config volume (location specified in nginx.conf, no need to soft link)
-if [ ! -f "/config/nginx/security/auth" ]; then
-
-	echo "[info] nginx security file doesnt exist, copying default to /config/nginx/security/..."
-
-	mkdir -p /config/nginx/security
-	cp /home/nobody/nginx/security/* /config/nginx/security/
-
-else
-
-	echo "[info] nginx security file already exists, skipping copy"
-
-fi
-
 # if nginx config file doesnt exist then copy default to host config volume (soft linked)
 if [ ! -f "/config/nginx/config/nginx.conf" ]; then
 
@@ -248,6 +234,8 @@ if [[ "${ENABLE_RPC2}" == "yes" ]]; then
 	# if rpc authentication enabled then add in lines
 	if [[ "${ENABLE_RPC2_AUTH}" == "yes" ]]; then
 
+		mkdir -p /config/nginx/security
+
 		if [[ -z "${check_rpc2_secure}" ]]; then
 
 			echo "[info] enabling basic auth for /rpc2..."
@@ -299,6 +287,8 @@ fi
 
 # if web ui authentication enabled then add in lines
 if [[ "${ENABLE_WEBUI_AUTH}" == "yes" ]]; then
+
+	mkdir -p /config/nginx/security
 
 	auth_file="/config/nginx/security/webui_auth"
 

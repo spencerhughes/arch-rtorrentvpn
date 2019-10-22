@@ -484,31 +484,58 @@ else
 	export ENABLE_RPC2="yes"
 fi
 
-export ENABLE_RPC2_AUTH=$(echo "${ENABLE_RPC2_AUTH}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-if [[ ! -z "${ENABLE_RPC2_AUTH}" ]]; then
-	echo "[info] ENABLE_RPC2_AUTH defined as '${ENABLE_RPC2_AUTH}'" | ts '%Y-%m-%d %H:%M:%.S'
-else
-	echo "[warn] ENABLE_RPC2_AUTH not defined (via -e ENABLE_RPC2_AUTH), defaulting to 'yes'" | ts '%Y-%m-%d %H:%M:%.S'
-	export ENABLE_RPC2_AUTH="yes"
+if [[ $ENABLE_RPC2 == "yes" ]]; then
+	export ENABLE_RPC2_AUTH=$(echo "${ENABLE_RPC2_AUTH}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+	if [[ ! -z "${ENABLE_RPC2_AUTH}" ]]; then
+		echo "[info] ENABLE_RPC2_AUTH defined as '${ENABLE_RPC2_AUTH}'" | ts '%Y-%m-%d %H:%M:%.S'
+	else
+		echo "[warn] ENABLE_RPC2_AUTH not defined (via -e ENABLE_RPC2_AUTH), defaulting to 'yes'" | ts '%Y-%m-%d %H:%M:%.S'
+		export ENABLE_RPC2_AUTH="yes"
+	fi
+
+	if [[ $ENABLE_RPC2_AUTH == "yes" ]]; then
+		export RPC2_USER=$(echo "${RPC2_USER}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+		if [[ ! -z "${RPC2_USER}" ]]; then
+			echo "[info] RPC2_USER defined as '${RPC2_USER}'" | ts '%Y-%m-%d %H:%M:%.S'
+		else
+			echo "[warn] RPC2_USER not defined (via -e RPC2_USER), defaulting to 'admin'" | ts '%Y-%m-%d %H:%M:%.S'
+			export RPC2_USER="admin"
+		fi
+
+		export RPC2_PASS=$(echo "${RPC2_PASS}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+		if [[ ! -z "${RPC2_PASS}" ]]; then
+			echo "[info] RPC2_PASS defined as '${RPC2_PASS}'" | ts '%Y-%m-%d %H:%M:%.S'
+		else
+			echo "[warn] RPC2_PASS not defined (via -e RPC2_PASS), defaulting to 'rutorrent'" | ts '%Y-%m-%d %H:%M:%.S'
+			export RPC2_PASS="rutorrent"
+		fi
+	fi
 fi
 
-if [[ $ENABLE_RPC2_AUTH == "yes" ]]; then
-	export RPC2_USER=$(echo "${RPC2_USER}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-	if [[ ! -z "${RPC2_USER}" ]]; then
-		echo "[info] RPC2_USER defined as '${RPC2_USER}'" | ts '%Y-%m-%d %H:%M:%.S'
+export ENABLE_WEBUI_AUTH=$(echo "${ENABLE_WEBUI_AUTH}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+if [[ ! -z "${ENABLE_WEBUI_AUTH}" ]]; then
+	echo "[info] ENABLE_WEBUI_AUTH defined as '${ENABLE_WEBUI_AUTH}'" | ts '%Y-%m-%d %H:%M:%.S'
+else
+	echo "[warn] ENABLE_WEBUI_AUTH not defined (via -e ENABLE_WEBUI_AUTH), defaulting to 'yes'" | ts '%Y-%m-%d %H:%M:%.S'
+	export ENABLE_WEBUI_AUTH="yes"
+fi
+
+if [[ $ENABLE_WEBUI_AUTH == "yes" ]]; then
+	export WEBUI_USER=$(echo "${WEBUI_USER}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+	if [[ ! -z "${WEBUI_USER}" ]]; then
+		echo "[info] WEBUI_USER defined as '${WEBUI_USER}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
-		echo "[warn] RPC2_USER not defined (via -e RPC2_USER), defaulting to 'admin'" | ts '%Y-%m-%d %H:%M:%.S'
-		export RPC2_USER="admin"
+		echo "[warn] WEBUI_USER not defined (via -e WEBUI_USER), defaulting to 'admin'" | ts '%Y-%m-%d %H:%M:%.S'
+		export WEBUI_USER="admin"
 	fi
 
-	export RPC2_PASS=$(echo "${RPC2_PASS}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
-	if [[ ! -z "${RPC2_PASS}" ]]; then
-		echo "[info] RPC2_PASS defined as '${RPC2_PASS}'" | ts '%Y-%m-%d %H:%M:%.S'
+	export WEBUI_PASS=$(echo "${WEBUI_PASS}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+	if [[ ! -z "${WEBUI_PASS}" ]]; then
+		echo "[info] WEBUI_PASS defined as '${WEBUI_PASS}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
-		echo "[warn] RPC2_PASS not defined (via -e RPC2_PASS), defaulting to 'rutorrent'" | ts '%Y-%m-%d %H:%M:%.S'
-		export RPC2_PASS="rutorrent"
+		echo "[warn] WEBUI_PASS not defined (via -e WEBUI_PASS), defaulting to 'rutorrent'" | ts '%Y-%m-%d %H:%M:%.S'
+		export WEBUI_PASS="rutorrent"
 	fi
-
 fi
 
 export APPLICATION="rtorrent"
