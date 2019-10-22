@@ -260,8 +260,17 @@ if [[ "${ENABLE_RPC2}" == "yes" ]]; then
 
 		fi
 
-		echo "[info] Setting RPC2 username and password..."
-		/usr/bin/htpasswd -b -c "${auth_file}" "${RPC2_USER}" "${RPC2_PASS}"
+		if [ -f "${auth_file}" ]; then
+
+			echo "[info] Updating password for rpc2 account '${RPC2_USER}'..."
+			/usr/bin/htpasswd -b "${auth_file}" "${RPC2_USER}" "${RPC2_PASS}"
+
+		else
+
+			echo "[info] Creating auth file for rpc2 account '${RPC2_USER}'..."
+			/usr/bin/htpasswd -b -c "${auth_file}" "${RPC2_USER}" "${RPC2_PASS}"
+
+		fi
 
 	else
 
@@ -308,8 +317,17 @@ if [[ "${ENABLE_WEBUI_AUTH}" == "yes" ]]; then
 
 	fi
 
-	echo "[info] Setting web ui username and password..."
-	/usr/bin/htpasswd -b -c "${auth_file}" "${WEBUI_USER}" "${WEBUI_PASS}"
+	if [ -f "${auth_file}" ]; then
+
+		echo "[info] Updating password for web ui account '${WEBUI_USER}'..."
+		/usr/bin/htpasswd -b "${auth_file}" "${WEBUI_USER}" "${WEBUI_PASS}"
+
+	else
+
+		echo "[info] Creating auth file for web ui account '${WEBUI_USER}'..."
+		/usr/bin/htpasswd -b -c "${auth_file}" "${WEBUI_USER}" "${WEBUI_PASS}"
+
+	fi
 
 else
 
