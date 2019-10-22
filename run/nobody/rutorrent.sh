@@ -241,7 +241,7 @@ if [[ "${ENABLE_RPC2}" == "yes" ]]; then
 			echo "[info] enabling basic auth for /rpc2..."
 
 			# delete existing /rpc2 location (cannot easily edit and replace lines without insertion)
-			sed -i '/location \/RPC2/,/}/{//!d}' "/config/nginx/config/nginx.conf"
+			sed -i -r '/location \/RPC2\s/,/}/{//!d}' "/config/nginx/config/nginx.conf"
 
 			# call function to enable authentication for rpc2
 			nginx_auth "${ENABLE_RPC2_AUTH}" "${auth_file}" "/RPC2"
@@ -267,7 +267,7 @@ if [[ "${ENABLE_RPC2}" == "yes" ]]; then
 			echo "[info] disabling basic auth for /rpc2..."
 
 			# delete existing /rpc2 location (cannot easily edit and replace lines without insertion)
-			sed -i '/location \/RPC2/,/}/{//!d}' "/config/nginx/config/nginx.conf"
+			sed -i -r '/location \/RPC2\s/,/}/{//!d}' "/config/nginx/config/nginx.conf"
 
 			# call function to disable authentication for rpc2
 			nginx_auth "${ENABLE_RPC2_AUTH}" "" "/RPC2"
@@ -281,7 +281,7 @@ else
 	echo "[info] nginx /rpc2 location not enabled"
 
 	# delete existing /rpc2 location
-	sed -i '/location \/RPC2/,/}/{//!d}' "/config/nginx/config/nginx.conf"
+	sed -i -r '/location \/RPC2\s/,/}/{//!d}' "/config/nginx/config/nginx.conf"
 
 fi
 
@@ -300,7 +300,7 @@ if [[ "${ENABLE_WEBUI_AUTH}" == "yes" ]]; then
 		echo "[info] enabling basic auth for web ui..."
 
 		# delete existing / location (cannot easily edit and replace lines without insertion)
-		sed -i '/location \//,/}/{//!d}' "/config/nginx/config/nginx.conf"
+		sed -i -r '/location \/\s/,/}/{//!d}' "/config/nginx/config/nginx.conf"
 
 		# call function to enable authentication for web ui
 		nginx_auth "${ENABLE_WEBUI_AUTH}" "${auth_file}" "/"
@@ -326,7 +326,7 @@ else
 		echo "[info] disabling basic auth for web ui..."
 
 		# delete existing web ui location (/) (cannot easily edit and replace lines without insertion)
-		sed -i '/location \//,/}/{//!d}' "/config/nginx/config/nginx.conf"
+		sed -i -r '/location \/\s/,/}/{//!d}' "/config/nginx/config/nginx.conf"
 
 		# call function to disable authentication for web ui
 		nginx_auth "${ENABLE_WEBUI_AUTH}" "" "/"
