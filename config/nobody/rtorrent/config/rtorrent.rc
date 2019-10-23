@@ -35,10 +35,6 @@
 #
 #network.max_open_files.set = 600
 
-# Maximum number of simultanious uploads per torrent.
-#
-#throttle.max_uploads.set = 15
-
 # Default directory to save the downloaded torrents.
 #
 execute = {/bin/bash,-c,mkdir -p /data/incomplete}
@@ -93,6 +89,13 @@ network.http.ssl_verify_peer.set = 0
 #
 trackers.use_udp.set = yes
 
+# Set the maximum permitted single file size in a torrent.
+# Note if you do not set this and attempt to start a torrent that
+# contains a file larger than 512 GB (default) then the torrent will
+# not start.
+#
+#system.file.max_size.set = 1024G
+
 # Alternative calls to bind and ip that should handle dynamic ip's.
 #
 #schedule2 = ip_tick,0,1800,ip=rakshasa
@@ -101,9 +104,12 @@ trackers.use_udp.set = yes
 # Encryption options, set to none (default) or any combination of the following:
 # allow_incoming, try_outgoing, require, require_RC4, enable_retry, prefer_plaintext
 #
-# The example value allows incoming encrypted connections, starts unencrypted
-# outgoing connections but retries with encryption if they fail, preferring
-# plaintext to RC4 encryption after the encrypted handshake
+# allow_incoming - Allow incoming encrypted connections from other peers
+# try_outgoing - Attempt to set up encryption when initiating a connection
+# require - Require encryption, and reject to peers who don't support it
+# require_RC4 - Require RC4 encryption specifically
+# enable_retry - If a peer is rejected for not supporting the encryption we need, retry the handshake
+# prefer_plaintext - Prefer plaintext encryption
 #
 protocol.encryption.set = allow_incoming,try_outgoing,enable_retry
 
