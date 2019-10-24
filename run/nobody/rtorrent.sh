@@ -47,18 +47,12 @@ else
 			# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface and port
 			/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -p ${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT} -o ip=${external_ip} -o dht_port=${VPN_INCOMING_PORT}"
 
-			# set rtorrent port to current vpn port (used when checking for changes on next run)
-			rtorrent_port="${VPN_INCOMING_PORT}"
-
 		else
 
 			# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface
 			/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -o ip=${external_ip}"
 
 		fi
-
-		# set rtorrent ip to current vpn ip (used when checking for changes on next run)
-		rtorrent_ip="${vpn_ip}"
 
 	else
 
@@ -76,9 +70,7 @@ else
 			retry_count=$((retry_count-1))
 			if [ "${retry_count}" -eq "0" ]; then
 
-				echo "[warn] Wait for rTorrent process to start aborted, too many retries"
-				echo "[warn] Showing output from command before exit..."
-				timeout 10 /usr/bin/rtorrent -b "${vpn_ip}" -o ip="${external_ip}" ; exit 1
+				echo "[warn] Wait for rTorrent process to start aborted, too many retries" ; return 1
 
 			else
 
@@ -108,3 +100,9 @@ else
 	echo "[info] rTorrent process listening on port 5000"
 
 fi
+
+# set rtorrent port to current vpn port (used when checking for changes on next run)
+rtorrent_port="${VPN_INCOMING_PORT}"
+
+# set rtorrent ip to current vpn ip (used when checking for changes on next run)
+rtorrent_ip="${vpn_ip}"
