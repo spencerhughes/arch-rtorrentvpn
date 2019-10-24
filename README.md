@@ -182,7 +182,7 @@ User ID (PUID) and Group ID (PGID) can be found by issuing the following command
 
 If you want to create an additional user account for ruTorrent webui then please execute the following on the host:-
 
-`docker exec -it <container name> /home/nobody/createuser.sh <username to create>`
+`docker exec -it <container name> /home/nobody/createuser.sh <username to create> <password for the user>`
 
 If you want to delete a user account (or change the password for an account) then please execute the following on the host:-
 
