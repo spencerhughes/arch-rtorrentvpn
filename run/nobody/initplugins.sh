@@ -19,5 +19,5 @@ echo "[info] nginx running"
 echo "[info] Initialising ruTorrent plugins..."
 
 # run php plugins for rutorent (required for scheduler and rss feed plugins)
-/usr/bin/php /usr/share/webapps/rutorrent/php/initplugins.php admin
+/usr/bin/php /usr/share/webapps/rutorrent/php/initplugins.php "${WEBUI_USER}"
 echo "[info] ruTorrent plugins initialised"
