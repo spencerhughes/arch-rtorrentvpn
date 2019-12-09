@@ -148,4 +148,6 @@ scgi_port = 0.0.0.0:5000
 # the same command has been added to the script /home/nobody/initplugins.sh in order to 
 # attempt to ensure all plugins are initialised.
 #
-execute = {/bin/bash,-c,/usr/bin/sleep 10s && /usr/bin/php /usr/share/webapps/rutorrent/php/initplugins.php "${WEBUI_USER}" &}
+# NOTE - Do not double quote or curly brackets env var for 'WEBUI_USER'
+#
+execute = {/bin/bash,-c,/usr/bin/sleep 10s && /usr/bin/php /usr/share/webapps/rutorrent/php/initplugins.php $WEBUI_USER &}
