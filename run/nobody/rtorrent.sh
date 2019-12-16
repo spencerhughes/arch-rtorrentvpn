@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# kill rtorrent (required due to the fact rtorrent cannot cope with dynamic changes to port)
+# if rtorrent is already running then use xmlrpc to reconfigure
 if [[ "${rtorrent_running}" == "true" ]]; then
 
 	if [[ "${ENABLE_RPC2_AUTH}" == "yes" ]]; then
