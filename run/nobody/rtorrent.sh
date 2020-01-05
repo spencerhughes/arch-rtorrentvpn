@@ -3,35 +3,29 @@
 # if rtorrent is already running then use xmlrpc to reconfigure
 if [[ "${rtorrent_running}" == "true" ]]; then
 
-	if [[ "${ENABLE_RPC2_AUTH}" == "yes" ]]; then
-		xmlrpc_connection="localhost:9080 -username=${RPC2_USER} -password=${RPC2_PASS}"
-	else
-		xmlrpc_connection="localhost:9080"
-	fi
-
 	# useful for debug and finding valid methods
-	#xmlrpc ${xmlrpc_connection} system.listMethods
+	#rtxmlrpc system.listMethods
 
-	# note 'i/0' is required? (integer) as first parameter for subsequent xmlrpc commands
+	# note '' is required? as first parameter for subsequent rxmlrpc commands
 
 	# set new value for incoming port
-	if xmlrpc ${xmlrpc_connection} network.port_range.set 'i/0' "${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT}"; then
+	if rtxmlrpc network.port_range.set '' "${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT}"; then
 		# set rtorrent port to current vpn port (used when checking for changes on next run)
 		rtorrent_port="${VPN_INCOMING_PORT}"
 	fi
 
 	# set new value for bind to vpn tunnel ip
 	# note this must come AFTER the port has been changed, otherwise the port change does not take effect
-	if xmlrpc ${xmlrpc_connection} network.bind_address.set 'i/0' "${vpn_ip}"; then
+	if rtxmlrpc network.bind_address.set '' "${vpn_ip}"; then
 		# set rtorrent ip to current vpn ip (used when checking for changes on next run)
 		rtorrent_ip="${vpn_ip}"
 	fi
 
 	# set new value for ip address sent to tracker
-	xmlrpc ${xmlrpc_connection} network.local_address.set 'i/0' "${external_ip}"
+	rtxmlrpc network.local_address.set '' "${external_ip}"
 
 	# set new value for dht port (same as incoming port)
-	xmlrpc ${xmlrpc_connection} dht.port.set 'i/0' "${VPN_INCOMING_PORT}"
+	rtxmlrpc dht.port.set '' "${VPN_INCOMING_PORT}"
 
 else
 
