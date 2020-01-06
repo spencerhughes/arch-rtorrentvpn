@@ -32,9 +32,6 @@ sed -i '/system.file_allocate.set/d' "${rtorrent_config}"
 # create soft link to rtorrent config file
 ln -fs "${rtorrent_config}" ~/.rtorrent.rc
 
-# define connection to rtorrent rpc (used to reconfigure rtorrent)
-xmlrpc_connection="localhost:9080"
-
 # set default values for port and ip
 rtorrent_port="49160"
 rtorrent_ip="0.0.0.0"
