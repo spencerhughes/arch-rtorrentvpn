@@ -21,7 +21,7 @@ mv /tmp/scripts-master/shell/arch/docker/*.sh /usr/local/bin/
 libtorrentps_package_name="libtorrent-ps.tar.xz"
 
 # download compiled libtorrent-ps (used by rtorrent-ps)
-curly.sh -rc 6 -rw 10 -of "/tmp/${libtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/libtorrent-ps.tar.xz"
+curly.sh -rc 6 -rw 10 -of "/tmp/${libtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/${libtorrentps_package_name}"
 
 # install libtorrent-ps
 pacman -U "/tmp/${libtorrentps_package_name}" --noconfirm
@@ -29,13 +29,22 @@ pacman -U "/tmp/${libtorrentps_package_name}" --noconfirm
 rtorrentps_package_name="rtorrent-ps.tar.xz"
 
 # download compiled rtorrent-ps (cannot compile during docker build)
-curly.sh -rc 6 -rw 10 -of "/tmp/${rtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/rtorrent-ps.tar.xz"
+curly.sh -rc 6 -rw 10 -of "/tmp/${rtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/${rtorrentps_package_name}"
 
 # install rtorrent-ps
 pacman -U "/tmp/${rtorrentps_package_name}" --noconfirm
 
 # set tmux to use 256 colors (required by rtorrent-ps)
 echo 'set -g default-terminal "screen-256color"' > /home/nobody/.tmux.conf
+
+ffmpeg_package_name="ffmpeg-release-amd64-static.tar.xz"
+
+# download statically linked ffmpeg (used by rutorrent screenshots plugin)
+curly.sh -rc 6 -rw 10 -of "/tmp/${ffmpeg_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/static/${ffmpeg_package_name}"
+
+# unpack and move binaries
+mkdir -p "/tmp/unpack" && tar -xvf "/tmp/${ffmpeg_package_name}" -C "/tmp/unpack"
+mv /tmp/unpack/ffmpeg*/ff* "/usr/bin/"
 
 # pacman packages
 ####
