@@ -506,7 +506,7 @@ if [[ $ENABLE_RPC2 == "yes" ]]; then
 		export RPC2_USER=$(echo "${RPC2_USER}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 		if [[ ! -z "${RPC2_USER}" ]]; then
 			echo "[info] RPC2_USER defined as '${RPC2_USER}'" | ts '%Y-%m-%d %H:%M:%.S'
-		elsez
+		else
 			echo "[warn] RPC2_USER not defined (via -e RPC2_USER), defaulting to 'admin'" | ts '%Y-%m-%d %H:%M:%.S'
 			export RPC2_USER="admin"
 		fi
