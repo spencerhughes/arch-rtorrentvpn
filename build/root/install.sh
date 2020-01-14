@@ -513,7 +513,7 @@ if [[ $ENABLE_RPC2 == "yes" ]]; then
 
 		export RPC2_PASS=$(echo "${RPC2_PASS}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 		if [[ ! -z "${RPC2_PASS}" ]]; then
-			if [[ "${RPC2_PASS}" == "rutorrent" ]}; then
+			if [[ "${RPC2_PASS}" == "rutorrent" ]]; then
 				echo "[warn] RPC2_PASS defined (via -e RPC2_PASS) is weak, please consider using a stronger password" | ts '%Y-%m-%d %H:%M:%.S'
 			fi
 			echo "[info] RPC2_PASS defined as '${RPC2_PASS}'" | ts '%Y-%m-%d %H:%M:%.S'
@@ -550,7 +550,7 @@ if [[ $ENABLE_WEBUI_AUTH == "yes" ]]; then
 
 	export WEBUI_PASS=$(echo "${WEBUI_PASS}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 	if [[ ! -z "${WEBUI_PASS}" ]]; then
-		if [[ "${WEBUI_PASS}" == "rutorrent" ]}; then
+		if [[ "${WEBUI_PASS}" == "rutorrent" ]]; then
 			echo "[warn] WEBUI_PASS defined (via -e WEBUI_PASS) is weak, please consider using a stronger password" | ts '%Y-%m-%d %H:%M:%.S'
 		fi
 		echo "[info] WEBUI_PASS defined as '${WEBUI_PASS}'" | ts '%Y-%m-%d %H:%M:%.S'
