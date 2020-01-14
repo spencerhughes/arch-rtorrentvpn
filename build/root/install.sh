@@ -506,18 +506,28 @@ if [[ $ENABLE_RPC2 == "yes" ]]; then
 		export RPC2_USER=$(echo "${RPC2_USER}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 		if [[ ! -z "${RPC2_USER}" ]]; then
 			echo "[info] RPC2_USER defined as '${RPC2_USER}'" | ts '%Y-%m-%d %H:%M:%.S'
-		else
+		elsez
 			echo "[warn] RPC2_USER not defined (via -e RPC2_USER), defaulting to 'admin'" | ts '%Y-%m-%d %H:%M:%.S'
 			export RPC2_USER="admin"
 		fi
 
 		export RPC2_PASS=$(echo "${RPC2_PASS}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 		if [[ ! -z "${RPC2_PASS}" ]]; then
+			if [[ "${RPC2_PASS}" == "rutorrent" ]}; then
+				echo "[warn] RPC2_PASS defined (via -e RPC2_PASS) is weak, please consider using a stronger password" | ts '%Y-%m-%d %H:%M:%.S'
+			fi
 			echo "[info] RPC2_PASS defined as '${RPC2_PASS}'" | ts '%Y-%m-%d %H:%M:%.S'
 		else
-			echo "[warn] RPC2_PASS not defined (via -e RPC2_PASS), defaulting to 'rutorrent'" | ts '%Y-%m-%d %H:%M:%.S'
-			export RPC2_PASS="rutorrent"
+			rpc2_pass_file="/config/nginx/security/rpc2_pass"
+			if [ ! -f "${rpc2_pass_file}" ]; then
+				# generate random password for web ui using SHA to hash the date,
+				# run through base64, and then output the top 16 characters to a file.
+				date +%s | sha256sum | base64 | head -c 16 > "${rpc2_pass_file}"
+			fi
+			echo "[warn] RPC2_PASS not defined (via -e RPC2_PASS), using randomised password (password stored in '${rpc2_pass_file}')" | ts '%Y-%m-%d %H:%M:%.S'
+			export RPC2_PASS="$(cat ${rpc2_pass_file})"
 		fi
+
 	fi
 fi
 
@@ -540,10 +550,19 @@ if [[ $ENABLE_WEBUI_AUTH == "yes" ]]; then
 
 	export WEBUI_PASS=$(echo "${WEBUI_PASS}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 	if [[ ! -z "${WEBUI_PASS}" ]]; then
+		if [[ "${WEBUI_PASS}" == "rutorrent" ]}; then
+			echo "[warn] WEBUI_PASS defined (via -e WEBUI_PASS) is weak, please consider using a stronger password" | ts '%Y-%m-%d %H:%M:%.S'
+		fi
 		echo "[info] WEBUI_PASS defined as '${WEBUI_PASS}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
-		echo "[warn] WEBUI_PASS not defined (via -e WEBUI_PASS), defaulting to 'rutorrent'" | ts '%Y-%m-%d %H:%M:%.S'
-		export WEBUI_PASS="rutorrent"
+		webui_pass_file="/config/nginx/security/webui_pass"
+		if [ ! -f "${webui_pass_file}" ]; then
+			# generate random password for web ui using SHA to hash the date,
+			# run through base64, and then output the top 16 characters to a file.
+			date +%s | sha256sum | base64 | head -c 16 > "${webui_pass_file}"
+		fi
+		echo "[warn] WEBUI_PASS not defined (via -e WEBUI_PASS), using randomised password (password stored in '${webui_pass_file}')" | ts '%Y-%m-%d %H:%M:%.S'
+		export WEBUI_PASS="$(cat ${webui_pass_file})"
 	fi
 fi
 
