@@ -17,6 +17,13 @@ Latest stable ruTorrent release from Arch Linux AUR.
 Latest stable OpenVPN release from Arch Linux repo.
 Latest stable Privoxy release from Arch Linux repo.
 
+**!!! IMPORTANT !!!**
+
+As from 15th of January 2020, if the web ui and/or rpc2 password have not been defined (defined via environment variables) then the password(s) will be randomised and no longer set to 'rutorrent'.
+
+Please see link below to the rtorrentvpn FAQ, Q3. and Q4. for more details:-
+https://github.com/binhex/documentation/blob/master/docker/faq/rtorrentvpn.md
+
 **Usage**
 ```
 docker run -d \
@@ -63,8 +70,8 @@ or
 
 `https://<host ip>:9443/`
 
-Username:- <webui username>
-Password:- <webui password>
+Username:- Value of 'WEBUI_USER'
+Password:- Value of 'WEBUI_PASS'
 
 **Access Privoxy**
 
@@ -92,9 +99,9 @@ docker run -d \
     -e ENABLE_RPC2_AUTH=yes \
     -e ENABLE_WEBUI_AUTH=yes \
     -e RPC2_USER=admin \
-    -e RPC2_PASS=rutorrent \
+    -e RPC2_PASS=NzRhMjE4NjUzZDYw \
     -e WEBUI_USER=admin \
-    -e WEBUI_PASS=rutorrent \
+    -e WEBUI_PASS=NzRhMjE4NjUzZDYw \
     -e LAN_NETWORK=192.168.1.0/24 \
     -e NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1 \
     -e DEBUG=false \
@@ -143,9 +150,9 @@ docker run -d \
     -e ENABLE_RPC2_AUTH=yes \
     -e ENABLE_WEBUI_AUTH=yes \
     -e RPC2_USER=admin \
-    -e RPC2_PASS=rutorrent \
+    -e RPC2_PASS=NzRhMjE4NjUzZDYw \
     -e WEBUI_USER=admin \
-    -e WEBUI_PASS=rutorrent \
+    -e WEBUI_PASS=NzRhMjE4NjUzZDYw \
     -e LAN_NETWORK=192.168.1.0/24 \
     -e NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1 \
     -e DEBUG=false \
