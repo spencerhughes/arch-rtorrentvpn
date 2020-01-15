@@ -70,7 +70,7 @@ or
 
 `https://<host ip>:9443/`
 
-Username:- Value of 'WEBUI_USER'
+Username:- Value of 'WEBUI_USER'  
 Password:- Value of 'WEBUI_PASS'
 
 **Access Privoxy**
