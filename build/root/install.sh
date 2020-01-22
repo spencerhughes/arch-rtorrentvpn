@@ -108,6 +108,14 @@ curly.sh -rc 6 -rw 10 -of /tmp/htpasswd.tar.gz -url "https://github.com/binhex/a
 # extract compiled version of htpasswd
 tar -xvf /tmp/htpasswd.tar.gz -C /
 
+# config - nginx
+####
+
+# due to 'fs.protected_hardlinks = 1' being potentially set we need to grant user 'nobody'
+# rwx for the file '/usr/bin/nginx' in order to permit hard linking (fix for synology users)
+#
+chmod +rwx /usr/bin/nginx
+
 # config - php
 ####
 
