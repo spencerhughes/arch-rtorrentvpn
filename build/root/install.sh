@@ -113,8 +113,7 @@ tar -xvf /tmp/htpasswd.tar.gz -C /
 
 # due to 'fs.protected_hardlinks = 1' being potentially set we need to grant user 'nobody'
 # rwx for the file '/usr/bin/nginx' in order to permit hard linking (fix for synology users)
-#
-chmod +rwx /usr/bin/nginx
+chmod 777 /usr/bin/nginx
 
 # config - php
 ####
