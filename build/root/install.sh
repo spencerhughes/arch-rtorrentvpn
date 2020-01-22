@@ -50,7 +50,7 @@ mv /tmp/unpack/ffmpeg*/ff* "/usr/bin/"
 ####
 
 # define pacman packages
-pacman_packages="git nginx php-fpm rsync openssl tmux mediainfo php-geoip libx264 libvpx xmlrpc-c sox python2 python-pip"
+pacman_packages="git nginx php-fpm rsync openssl tmux mediainfo php-geoip zip libx264 libvpx xmlrpc-c sox python2 python-pip"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
@@ -111,8 +111,10 @@ tar -xvf /tmp/htpasswd.tar.gz -C /
 # config - nginx
 ####
 
-# due to 'fs.protected_hardlinks = 1' being potentially set we need to grant user 'nobody'
-# rwx for the file '/usr/bin/nginx' in order to permit hard linking (fix for synology users)
+# due to 'fs.protected_hardlinks = 1' being potentially set we need to grant user 'nobody' rwx for the
+# file '/usr/bin/nginx' in order to permit hard linking (fix for synology users).
+# see here for details:-
+# https://unix.stackexchange.com/questions/233275/hard-link-creation-permissions
 chmod 777 /usr/bin/nginx
 
 # config - php
