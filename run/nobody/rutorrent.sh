@@ -337,6 +337,9 @@ echo "[info] starting nginx..."
 # hard link (soft link doesn't fix the issue) the nginx binary to prevent Apparmor trigger for
 # Synology users - link to issue:- https://github.com/binhex/arch-rtorrentvpn/issues/138
 #
+# due to 'fs.protected_hardlinks = 1' being potentially set we also need to grant user 'nobody'
+# rw for the file '/usr/bin/nginx', thus the chmod
+#
 # run nginx in foreground and specify path to pid file
-ln -f /usr/bin/nginx /home/nobody/bin/
+chmod +rwx /usr/bin/nginx && ln -f /usr/bin/nginx /home/nobody/bin/
 /home/nobody/bin/nginx -g "daemon off; pid /home/nobody/nginx.pid;"
