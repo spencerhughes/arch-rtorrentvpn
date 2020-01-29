@@ -20,15 +20,23 @@ if [[ "${rtorrent_running}" == "true" ]]; then
 
 	fi
 
-	# set new value for bind to vpn tunnel ip
-	# note this must come AFTER the port has been changed, otherwise the port change does not take effect
-	if rtxmlrpc network.bind_address.set '' "${vpn_ip}"; then
-		# set rtorrent ip to current vpn ip (used when checking for changes on next run)
-		rtorrent_ip="${vpn_ip}"
-	fi
+	# bind address will fail if incoming port is not defined, thus we check the port is set
+	if [[ $(rtxmlrpc network.port_range) ]]; then
 
-	# set new value for ip address sent to tracker
-	rtxmlrpc network.local_address.set '' "${external_ip}"
+		# set new value for bind to vpn tunnel ip
+		if rtxmlrpc network.bind_address.set '' "${vpn_ip}"; then
+			# set rtorrent ip to current vpn ip (used when checking for changes on next run)
+			rtorrent_ip="${vpn_ip}"
+		fi
+
+		# set new value for ip address sent to tracker
+		rtxmlrpc network.local_address.set '' "${external_ip}"
+
+	else
+
+		echo "[warn] Incoming port range not defined, unable to bind IP address"
+
+	fi
 
 else
 
