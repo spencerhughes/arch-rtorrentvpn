@@ -5,13 +5,19 @@ if [[ "${rtorrent_running}" == "true" ]]; then
 
 	# useful for debug and finding valid methods
 	#rtxmlrpc system.listMethods
+	# note '' is required? as first parameter for subsequent rtxmlrpc commands
 
-	# note '' is required? as first parameter for subsequent rxmlrpc commands
+	if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
 
-	# set new value for incoming port
-	if rtxmlrpc network.port_range.set '' "${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT}"; then
-		# set rtorrent port to current vpn port (used when checking for changes on next run)
-		rtorrent_port="${VPN_INCOMING_PORT}"
+		# set new value for incoming port
+		if rtxmlrpc network.port_range.set '' "${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT}"; then
+			# set rtorrent port to current vpn port (used when checking for changes on next run)
+			rtorrent_port="${VPN_INCOMING_PORT}"
+		fi
+
+		# set new value for dht port (same as incoming port)
+		rtxmlrpc dht.port.set '' "${VPN_INCOMING_PORT}"
+
 	fi
 
 	# set new value for bind to vpn tunnel ip
@@ -24,9 +30,6 @@ if [[ "${rtorrent_running}" == "true" ]]; then
 	# set new value for ip address sent to tracker
 	rtxmlrpc network.local_address.set '' "${external_ip}"
 
-	# set new value for dht port (same as incoming port)
-	rtxmlrpc dht.port.set '' "${VPN_INCOMING_PORT}"
-
 else
 
 	echo "[info] Removing any rTorrent session lock files left over from the previous run..."
@@ -38,8 +41,11 @@ else
 
 		if [[ "${VPN_PROV}" == "pia" && -n "${VPN_INCOMING_PORT}" ]]; then
 
-			# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface and port
+			# run tmux attached to rTorrent (daemonized, non-blocking), specifying listening interface and incoming and dht port
 			/usr/bin/script /home/nobody/typescript --command "/usr/bin/tmux new-session -d -s rt -n rtorrent /usr/bin/rtorrent -b ${vpn_ip} -p ${VPN_INCOMING_PORT}-${VPN_INCOMING_PORT} -o ip=${external_ip} -o dht_port=${VPN_INCOMING_PORT}"
+
+			# set rtorrent port to current vpn port (used when checking for changes on next run)
+			rtorrent_port="${VPN_INCOMING_PORT}"
 
 		else
 
@@ -93,10 +99,7 @@ else
 
 	echo "[info] rTorrent process listening on port 5000"
 
+	# set rtorrent ip to current vpn ip (used when checking for changes on next run)
+	rtorrent_ip="${vpn_ip}"
+
 fi
-
-# set rtorrent port to current vpn port (used when checking for changes on next run)
-rtorrent_port="${VPN_INCOMING_PORT}"
-
-# set rtorrent ip to current vpn ip (used when checking for changes on next run)
-rtorrent_ip="${vpn_ip}"
