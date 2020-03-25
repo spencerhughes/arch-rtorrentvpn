@@ -51,6 +51,7 @@ while true; do
 	# reset triggers to negative values
 	rtorrent_running="false"
 	privoxy_running="false"
+	irssi_running="false"
 	ip_change="false"
 	vpn_port_change="false"
 	rtorrent_port_change="false"
@@ -73,6 +74,18 @@ while true; do
 
 			fi
 
+			# if irssi process not running (could be initial start or maybe due to kill rtorrent due to port/ip change) then start irssi
+			if ! pgrep -x "irssi" > /dev/null; then
+
+				echo "[info] irssi not running"
+
+			else
+
+				# mark as irssi as running
+				irssi_running="true"
+
+			fi
+
 			# check if rtorrent is running, if not then skip shutdown of process
 			if ! pgrep -x "rtorrent main" > /dev/null; then
 
@@ -85,19 +98,15 @@ while true; do
 
 			fi
 
-			if [[ "${ENABLE_PRIVOXY}" == "yes" ]]; then
+			# check if privoxy is running, if not then skip shutdown of process
+			if ! pgrep -fa "/usr/bin/privoxy" > /dev/null; then
 
-				# check if privoxy is running, if not then skip shutdown of process
-				if ! pgrep -fa "/usr/bin/privoxy" > /dev/null; then
+				echo "[info] Privoxy not running"
 
-					echo "[info] Privoxy not running"
+			else
 
-				else
-
-					# mark as privoxy as running
-					privoxy_running="true"
-
-				fi
+				# mark as privoxy as running
+				privoxy_running="true"
 
 			fi
 
@@ -141,15 +150,14 @@ while true; do
 
 			fi
 
+			if [[ "${irssi_running}" == "false" ]]; then
+
+				# run script to start irssi
+				source /home/nobody/irssi.sh
+
+			fi
+
 			if [[ "${rtorrent_port_change}" == "true" || "${ip_change}" == "true" || "${rtorrent_running}" == "false" ]]; then
-
-				# if irssi process not running (could be initial start or maybe due to kill rtorrent due to port/ip change) then start irssi
-				if ! pgrep -x "irssi" > /dev/null; then
-
-					# run script to start autodl-irssi
-					source /home/nobody/irssi.sh
-
-				fi
 
 				# run script to start rtorrent, it can also perform shutdown of rtorrent if its already running (required for port/ip change)
 				source /home/nobody/rtorrent.sh
@@ -166,14 +174,10 @@ while true; do
 
 			fi
 
-			if [[ "${ENABLE_PRIVOXY}" == "yes" ]]; then
+			if [[ "${privoxy_running}" == "false" ]]; then
 
-				if [[ "${privoxy_running}" == "false" ]]; then
-
-					# run script to start privoxy
-					source /home/nobody/privoxy.sh
-
-				fi
+				# run script to start privoxy
+				source /home/nobody/privoxy.sh
 
 			fi
 
@@ -185,18 +189,20 @@ while true; do
 
 	else
 
+		# if irssi process not running (could be initial start or maybe due to kill rtorrent due to port/ip change) then start irssi
+		if ! pgrep -x "irssi" > /dev/null; then
+
+			echo "[info] irssi not running"
+
+			# run script to start autodl-irssi
+			source /home/nobody/irssi.sh
+
+		fi
+
 		# check if rtorrent is running, if not then start via rtorrent.sh
 		if ! pgrep -x "rtorrent main" > /dev/null; then
 
 			echo "[info] rTorrent not running"
-
-			# if irssi process not running (could be initial start or maybe due to kill rtorrent due to port/ip change) then start irssi
-			if ! pgrep -x "irssi" > /dev/null; then
-
-				# run script to start autodl-irssi
-				source /home/nobody/irssi.sh
-
-			fi
 
 			# run script to start rtorrent
 			source /home/nobody/rtorrent.sh
@@ -206,17 +212,13 @@ while true; do
 
 		fi
 
-		if [[ "${ENABLE_PRIVOXY}" == "yes" ]]; then
+		# check if privoxy is running, if not then start via privoxy.sh
+		if ! pgrep -fa "/usr/bin/privoxy" > /dev/null; then
 
-			# check if privoxy is running, if not then start via privoxy.sh
-			if ! pgrep -fa "/usr/bin/privoxy" > /dev/null; then
+			echo "[info] Privoxy not running"
 
-				echo "[info] Privoxy not running"
-
-				# run script to start privoxy
-				source /home/nobody/privoxy.sh
-
-			fi
+			# run script to start privoxy
+			source /home/nobody/privoxy.sh
 
 		fi
 
