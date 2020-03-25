@@ -156,16 +156,8 @@ ln -fs /config/rutorrent/conf /usr/share/webapps/rutorrent
 # with existing plugins.ini, new users will not need this, please remove
 cp -f /usr/share/webapps/rutorrent/conf-backup/plugins.ini /config/rutorrent/conf/plugins.ini
 
-# if autodl-irssi enabled then enable plugin and copy config
+# if autodl-irssi enabled then enable plugin
 if [[ "${ENABLE_AUTODL_IRSSI}" == "yes" ]]; then
-
-	mkdir -p /config/autodl
-
-	if [ ! -f /config/autodl/autodl.cfg ]; then
-		cp /home/nobody/.autodl/autodl.cfg.bak /config/autodl/autodl.cfg
-	fi
-
-	ln -fs /config/autodl/autodl.cfg /home/nobody/.autodl/autodl.cfg
 
 	# enable autodl-plugin
 	sed -i -r '/^\[autodl-irssi\]/!b;n;cenabled = yes' /config/rutorrent/conf/plugins.ini

@@ -3,6 +3,14 @@
 # if autodl-irssi enabled then run, else log
 if [[ "${ENABLE_AUTODL_IRSSI}" == "yes" ]]; then
 
+	mkdir -p /config/autodl
+
+	if [ ! -f /config/autodl/autodl.cfg ]; then
+		cp /home/nobody/.autodl/autodl.cfg.bak /config/autodl/autodl.cfg
+	fi
+
+	ln -fs /config/autodl/autodl.cfg /home/nobody/.autodl/autodl.cfg
+
 	# change directory to script location and then run irssi via tmux
 	cd /home/nobody/.irssi/scripts/autorun
 
