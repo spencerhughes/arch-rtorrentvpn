@@ -143,9 +143,6 @@ while true; do
 
 			if [[ "${rtorrent_port_change}" == "true" || "${ip_change}" == "true" || "${rtorrent_running}" == "false" ]]; then
 
-				# run script to start rtorrent, it can also perform shutdown of rtorrent if its already running (required for port/ip change)
-				source /home/nobody/rtorrent.sh
-
 				# if irssi process not running (could be initial start or maybe due to kill rtorrent due to port/ip change) then start irssi
 				if ! pgrep -x "irssi" > /dev/null; then
 
@@ -153,6 +150,9 @@ while true; do
 					source /home/nobody/irssi.sh
 
 				fi
+
+				# run script to start rtorrent, it can also perform shutdown of rtorrent if its already running (required for port/ip change)
+				source /home/nobody/rtorrent.sh
 
 				# run script to initialise rutorrent plugins
 				source /home/nobody/initplugins.sh
@@ -190,9 +190,6 @@ while true; do
 
 			echo "[info] rTorrent not running"
 
-			# run script to start rtorrent
-			source /home/nobody/rtorrent.sh
-
 			# if irssi process not running (could be initial start or maybe due to kill rtorrent due to port/ip change) then start irssi
 			if ! pgrep -x "irssi" > /dev/null; then
 
@@ -200,6 +197,9 @@ while true; do
 				source /home/nobody/irssi.sh
 
 			fi
+
+			# run script to start rtorrent
+			source /home/nobody/rtorrent.sh
 
 			# run script to initialise rutorrent plugins
 			source /home/nobody/initplugins.sh
