@@ -52,6 +52,7 @@ docker run -d \
     -e WEBUI_PASS=<webui password> \
     -e LAN_NETWORK=<lan ipv4 network>/<cidr notation> \
     -e NAME_SERVERS=<name server ip(s)> \
+    -e ADDITIONAL_PORTS=<port number(s)> \
     -e DEBUG=<true|false> \
     -e PHP_TZ=<php timezone> \
     -e UMASK=<umask for created files> \
@@ -104,6 +105,7 @@ docker run -d \
     -e WEBUI_PASS=NzRhMjE4NjUzZDYw \
     -e LAN_NETWORK=192.168.1.0/24 \
     -e NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1 \
+    -e ADDITIONAL_PORTS=1234 \
     -e DEBUG=false \
     -e PHP_TZ=UTC \
     -e UMASK=000 \
@@ -155,6 +157,7 @@ docker run -d \
     -e WEBUI_PASS=NzRhMjE4NjUzZDYw \
     -e LAN_NETWORK=192.168.1.0/24 \
     -e NAME_SERVERS=209.222.18.222,84.200.69.80,37.235.1.174,1.1.1.1,209.222.18.218,37.235.1.177,84.200.70.40,1.0.0.1 \
+    -e ADDITIONAL_PORTS=1234 \
     -e DEBUG=false \
     -e PHP_TZ=UTC \
     -e UMASK=000 \
