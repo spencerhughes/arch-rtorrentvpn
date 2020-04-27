@@ -93,9 +93,6 @@ mkdir -p "/home/nobody/bin"
 pacman -S --needed gcc --noconfirm
 /opt/pyrocore/bin/pip install --ignore-installed -r "/opt/pyrocore/requirements-torque.txt"
 
-# once psutil is compiled then remove gcc
-pacman -Ru gcc --noconfirm
-
 # github master branch - autodl-irssi
 ####
 
