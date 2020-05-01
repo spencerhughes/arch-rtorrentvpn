@@ -21,7 +21,7 @@ mv /tmp/scripts-master/shell/arch/docker/*.sh /usr/local/bin/
 libtorrentps_package_name="libtorrent-ps.tar.xz"
 
 # download compiled libtorrent-ps (used by rtorrent-ps)
-curly.sh -rc 6 -rw 10 -of "/tmp/${libtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/${libtorrentps_package_name}"
+curly.sh -rc 6 -rw 10 -of "/tmp/${libtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/${OS_ARCH}/${libtorrentps_package_name}"
 
 # install libtorrent-ps
 pacman -U "/tmp/${libtorrentps_package_name}" --noconfirm
@@ -29,7 +29,7 @@ pacman -U "/tmp/${libtorrentps_package_name}" --noconfirm
 rtorrentps_package_name="rtorrent-ps.tar.xz"
 
 # download compiled rtorrent-ps (cannot compile during docker build)
-curly.sh -rc 6 -rw 10 -of "/tmp/${rtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/${rtorrentps_package_name}"
+curly.sh -rc 6 -rw 10 -of "/tmp/${rtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/${OS_ARCH}/${rtorrentps_package_name}"
 
 # install rtorrent-ps
 pacman -U "/tmp/${rtorrentps_package_name}" --noconfirm
@@ -100,7 +100,7 @@ pacman -S --needed gcc --noconfirm
 github.sh -df "github-download.zip" -dp "/tmp" -ep "/tmp/extracted" -ip "/usr/share/webapps/rutorrent/plugins/autodl-irssi" -go "autodl-community" -gr "autodl-rutorrent" -rt "source"
 
 # download htpasswd (problems with apache-tools and openssl 1.1.x)
-curly.sh -rc 6 -rw 10 -of /tmp/htpasswd.tar.gz -url "https://github.com/binhex/arch-packages/raw/master/compiled/htpasswd.tar.gz"
+curly.sh -rc 6 -rw 10 -of /tmp/htpasswd.tar.gz -url "https://github.com/binhex/arch-packages/raw/master/compiled/${OS_ARCH}/htpasswd.tar.gz"
 
 # extract compiled version of htpasswd
 tar -xvf /tmp/htpasswd.tar.gz -C /
