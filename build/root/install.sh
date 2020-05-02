@@ -15,6 +15,22 @@ unzip /tmp/scripts-master.zip -d /tmp
 # move shell scripts to /root
 mv /tmp/scripts-master/shell/arch/docker/*.sh /usr/local/bin/
 
+# detect image arch
+####
+
+OS_ARCH=$(cat /etc/os-release | grep -P -o -m 1 "(?=^ID\=).*" | grep -P -o -m 1 "[a-z]+$")
+if [[ ! -z "${OS_ARCH}" ]]; then
+	if [[ "${OS_ARCH}" == "arch" ]]; then
+		OS_ARCH="x86-64"
+	else
+		OS_ARCH="aarch64"
+	fi
+	echo "[info] OS_ARCH defined as '${OS_ARCH}'"
+else
+	echo "[warn] Unable to identify OS_ARCH, defaulting to 'x86-64'"
+	OS_ARCH="x86-64"
+fi
+
 # custom
 ####
 
@@ -37,10 +53,10 @@ pacman -U "/tmp/${rtorrentps_package_name}" --noconfirm
 # set tmux to use 256 colors (required by rtorrent-ps)
 echo 'set -g default-terminal "screen-256color"' > /home/nobody/.tmux.conf
 
-ffmpeg_package_name="ffmpeg-release-amd64-static.tar.xz"
+ffmpeg_package_name="ffmpeg-release-static.tar.xz"
 
 # download statically linked ffmpeg (used by rutorrent screenshots plugin)
-curly.sh -rc 6 -rw 10 -of "/tmp/${ffmpeg_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/static/${ffmpeg_package_name}"
+curly.sh -rc 6 -rw 10 -of "/tmp/${ffmpeg_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/static/${OS_ARCH}/${ffmpeg_package_name}"
 
 # unpack and move binaries
 mkdir -p "/tmp/unpack" && tar -xvf "/tmp/${ffmpeg_package_name}" -C "/tmp/unpack"
