@@ -88,8 +88,8 @@ source aur.sh
 # download rutorrent
 github.sh --install-path "/usr/share/webapps/rutorrent" --github-owner "Novik" --github-repo "ruTorrent" --query-type "branch" --download-branch "master"
 
-# rutorrent plugin cloudflare requires python module 'CfScrape', use pip to install (python-pip = python 3.x)
-pip install --ignore-installed CfScrape
+# rutorrent plugin cloudflare requires python module 'cloudscraper', use pip to install (python-pip = python 3.x)
+pip install --ignore-installed cloudscraper
 
 # github release - pyrocore
 ####
