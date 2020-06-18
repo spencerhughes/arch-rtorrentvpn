@@ -86,7 +86,7 @@ source aur.sh
 ####
 
 # download rutorrent
-github.sh -df github-rutorrent.zip -dp "/tmp" -ep "/tmp/extracted" -ip "/usr/share/webapps/rutorrent" -go "Novik" -gr "ruTorrent" -rt "source"
+github.sh --install-path "/usr/share/webapps/rutorrent" --github-owner "Novik" --github-repo "ruTorrent" --query-type "branch" --download-branch "master"
 
 # rutorrent plugin cloudflare requires python module 'CfScrape', use pip to install (python-pip = python 3.x)
 pip install --ignore-installed CfScrape
@@ -113,7 +113,7 @@ pacman -S --needed gcc --noconfirm
 ####
 
 # download autodl-irssi community plugin
-github.sh -df "github-download.zip" -dp "/tmp" -ep "/tmp/extracted" -ip "/usr/share/webapps/rutorrent/plugins/autodl-irssi" -go "autodl-community" -gr "autodl-rutorrent" -rt "source"
+github.sh --install-path "/usr/share/webapps/rutorrent/plugins/autodl-irssi" --github-owner "autodl-community" --github-repo "autodl-rutorrent"
 
 # download htpasswd (problems with apache-tools and openssl 1.1.x)
 curly.sh -rc 6 -rw 10 -of /tmp/htpasswd.tar.gz -url "https://github.com/binhex/arch-packages/raw/master/compiled/${OS_ARCH}/htpasswd.tar.gz"
