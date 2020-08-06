@@ -183,7 +183,7 @@ fi
 if [[ ! -z "${PHP_TZ}" ]]; then
 
 	echo "[info] Setting PHP timezone to ${PHP_TZ}..."
-	sed -i -e "s~.*date\.timezone \=.*~date\.timezone \= ${PHP_TZ}~g" "/config/rutorrent/conf/php.ini"
+	sed -i -e "s~.*date\.timezone \=.*~date\.timezone \= ${PHP_TZ}~g" "/config/rutorrent/php/php.ini"
 
 else
 
