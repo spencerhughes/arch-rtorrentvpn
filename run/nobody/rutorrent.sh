@@ -74,25 +74,13 @@ done
 
 echo "[info] rtorrent started, setting up rutorrent..."
 
-# if php timezone specified then set in php.ini (prevents issues with dst and rutorrent scheduler plugin)
-if [[ ! -z "${PHP_TZ}" ]]; then
-
-	echo "[info] Setting PHP timezone to ${PHP_TZ}..."
-	sed -i -e "s~.*date\.timezone \=.*~date\.timezone \= ${PHP_TZ}~g" "/etc/php/php.ini"
-
-else
-
-	echo "[warn] PHP timezone not set, this may cause issues with the ruTorrent Scheduler plugin, see here for a list of available PHP timezones, http://php.net/manual/en/timezones.php"
-
-fi
-
 # if nginx cert files dont exist then copy defaults to host config volume (location specified in nginx.conf, no need to soft link)
 if [[ ! -f "/config/nginx/certs/host.cert" || ! -f "/config/nginx/certs/host.key" ]]; then
 
 	echo "[info] nginx cert files doesnt exist, copying default to /config/nginx/certs/..."
 
-	mkdir -p /config/nginx/certs
-	cp /home/nobody/nginx/certs/* /config/nginx/certs/
+	mkdir -p '/config/nginx/certs'
+	cp '/home/nobody/nginx/certs/'* '/config/nginx/certs/'
 
 else
 
@@ -105,14 +93,14 @@ if [ ! -f "/config/nginx/config/nginx.conf" ]; then
 
 	echo "[info] nginx config file doesnt exist, copying default to /config/nginx/config/..."
 
-	mkdir -p /config/nginx/config
+	mkdir -p '/config/nginx/config'
 
 	# if nginx defaiult config file exists then delete
 	if [[ -f "/etc/nginx/nginx.conf" && ! -L "/etc/nginx/nginx.conf" ]]; then
-		rm -rf /etc/nginx/nginx.conf
+		rm -rf '/etc/nginx/nginx.conf'
 	fi
 	
-	cp /home/nobody/nginx/config/* /config/nginx/config/
+	cp '/home/nobody/nginx/config/'* '/config/nginx/config/'
 
 else
 
@@ -121,11 +109,33 @@ else
 fi
 
 # create soft link to nginx config file
-ln -fs /config/nginx/config/nginx.conf /etc/nginx/nginx.conf
+ln -fs '/config/nginx/config/nginx.conf' '/etc/nginx/nginx.conf'
+
+# if php.ini file exists in container then rename
+if [[ -f "/etc/php/php.ini" && ! -L "/etc/php/php.ini" ]]; then
+	mv '/etc/php/php.ini' '/etc/php/php.ini-backup' 2>/dev/null || true
+fi
+
+# if php.ini file doesnt exist then copy default to host config volume (soft linked)
+if [ ! -f "/config/rutorrent/conf/php.ini" ]; then
+
+	echo "[info] php.ini file doesnt exist, copying default to /config/rutorrent/conf/..."
+
+	mkdir -p '/config/rutorrent/conf'
+	cp '/etc/php/php.ini-backup' '/config/rutorrent/conf/php.ini'
+
+else
+
+	echo "[info] php.ini file already exists, skipping copy"
+
+fi
+
+# create soft link to php.ini file
+ln -fs '/config/rutorrent/conf/php.ini' '/etc/php/php.ini'
 
 # if conf folder exists in container then rename
 if [[ -d "/usr/share/webapps/rutorrent/conf" && ! -L "/usr/share/webapps/rutorrent/conf" ]]; then
-	mv /usr/share/webapps/rutorrent/conf /usr/share/webapps/rutorrent/conf-backup 2>/dev/null || true
+	mv '/usr/share/webapps/rutorrent/conf' '/usr/share/webapps/rutorrent/conf-backup' 2>/dev/null || true
 fi
 
 # if rutorrent conf folder doesnt exist then copy default to host config volume (soft linked)
@@ -133,9 +143,9 @@ if [ ! -d "/config/rutorrent/conf" ]; then
 
 	echo "[info] rutorrent conf folder doesnt exist, copying default to /config/rutorrent/conf/..."
 
-	mkdir -p /config/rutorrent/conf
+	mkdir -p '/config/rutorrent/conf'
 	if [[ -d "/usr/share/webapps/rutorrent/conf-backup" && ! -L "/usr/share/webapps/rutorrent/conf-backup" ]]; then
-		cp -R /usr/share/webapps/rutorrent/conf-backup/* /config/rutorrent/conf/ 2>/dev/null || true
+		cp -R '/usr/share/webapps/rutorrent/conf-backup/'* '/config/rutorrent/conf/' 2>/dev/null || true
 	fi
 
 else
@@ -150,35 +160,47 @@ else
 fi
 
 # create soft link to rutorrent conf folder
-ln -fs /config/rutorrent/conf /usr/share/webapps/rutorrent
+ln -fs '/config/rutorrent/conf' '/usr/share/webapps/rutorrent'
 
 # copy plugins.ini from container to host volume map required for users
 # with existing plugins.ini, new users will not need this, please remove
-cp -f /usr/share/webapps/rutorrent/conf-backup/plugins.ini /config/rutorrent/conf/plugins.ini
+cp -f '/usr/share/webapps/rutorrent/conf-backup/plugins.ini' '/config/rutorrent/conf/plugins.ini'
 
 # if autodl-irssi enabled then enable plugin
 if [[ "${ENABLE_AUTODL_IRSSI}" == "yes" ]]; then
 
 	# enable autodl-plugin
-	sed -i -r '/^\[autodl-irssi\]/!b;n;cenabled = yes' /config/rutorrent/conf/plugins.ini
+	sed -i -r '/^\[autodl-irssi\]/!b;n;cenabled = yes' '/config/rutorrent/conf/plugins.ini'
 
 else
 
 	# disable autodl-plugin
-	sed -i -r '/^\[autodl-irssi\]/!b;n;cenabled = no' /config/rutorrent/conf/plugins.ini
+	sed -i -r '/^\[autodl-irssi\]/!b;n;cenabled = no' '/config/rutorrent/conf/plugins.ini'
+
+fi
+
+# if php timezone specified then set in php.ini (prevents issues with dst and rutorrent scheduler plugin)
+if [[ ! -z "${PHP_TZ}" ]]; then
+
+	echo "[info] Setting PHP timezone to ${PHP_TZ}..."
+	sed -i -e "s~.*date\.timezone \=.*~date\.timezone \= ${PHP_TZ}~g" "/config/rutorrent/conf/php.ini"
+
+else
+
+	echo "[warn] PHP timezone not set, this may cause issues with the ruTorrent Scheduler plugin, see here for a list of available PHP timezones, http://php.net/manual/en/timezones.php"
 
 fi
 
 # create folder for rutorrent user plugins
-mkdir -p /config/rutorrent/user-plugins/theme/themes
+mkdir -p '/config/rutorrent/user-plugins/theme/themes'
 echo "Please place additional ruTorrent Plugins in this folder, and then restart the container for the change to take affect" > /config/rutorrent/user-plugins/README.txt
 echo "Please place additional ruTorrent Themes in this folder, and then restart the container for the change to take affect" > /config/rutorrent/user-plugins/theme/themes/README.txt
 echo "[info] running rsync to copy rutorrent user plugins to the plugins folder inside the container..."
-rsync --verbose --recursive --compress --human-readable --update /config/rutorrent/user-plugins/ /usr/share/webapps/rutorrent/plugins/
+rsync --verbose --recursive --compress --human-readable --update '/config/rutorrent/user-plugins/' '/usr/share/webapps/rutorrent/plugins/'
 
 # if share folder exists in container then rename
 if [[ -d "/usr/share/webapps/rutorrent/share" && ! -L "/usr/share/webapps/rutorrent/share" ]]; then
-	mv /usr/share/webapps/rutorrent/share /usr/share/webapps/rutorrent/share-backup 2>/dev/null || true
+	mv '/usr/share/webapps/rutorrent/share' '/usr/share/webapps/rutorrent/share-backup' 2>/dev/null || true
 fi
 
 # if rutorrent share folder doesnt exist then copy default to host config volume (soft linked)
@@ -186,9 +208,9 @@ if [ ! -d "/config/rutorrent/share" ]; then
 
 	echo "[info] rutorrent share folder doesnt exist, copying default to /config/rutorrent/share/..."
 
-	mkdir -p /config/rutorrent/share
+	mkdir -p '/config/rutorrent/share'
 	if [[ -d "/usr/share/webapps/rutorrent/share-backup" && ! -L "/usr/share/webapps/rutorrent/share-backup" ]]; then
-		cp -R /usr/share/webapps/rutorrent/share-backup/* /config/rutorrent/share/ 2>/dev/null || true
+		cp -R '/usr/share/webapps/rutorrent/share-backup/'* '/config/rutorrent/share/' 2>/dev/null || true
 	fi
 
 else
@@ -198,19 +220,19 @@ else
 fi
 
 # create soft link to rutorrent share folder
-ln -fs /config/rutorrent/share /usr/share/webapps/rutorrent
+ln -fs '/config/rutorrent/share' '/usr/share/webapps/rutorrent'
 
 # if defunct plugins-backup folder exists in container then rename back to plugins (for existing users)
 # this change is due to corruption of plugins and updates to plugins causing incompatibility
 if [ -d "/usr/share/webapps/rutorrent/plugins-backup" ]; then
-	rm -rf /usr/share/webapps/rutorrent/plugins 2>/dev/null || true
-	mv /usr/share/webapps/rutorrent/plugins-backup /usr/share/webapps/rutorrent/plugins 2>/dev/null || true
+	rm -rf '/usr/share/webapps/rutorrent/plugins' 2>/dev/null || true
+	mv '/usr/share/webapps/rutorrent/plugins-backup' '/usr/share/webapps/rutorrent/plugins' 2>/dev/null || true
 fi
 
 # if defunct plugins host volume map folder exists then remove (for existing users)
 # this change is due to corruption of plugins and updates to plugins causing incompatibility
 if [ -d "/config/rutorrent/plugins" ]; then
-	rm -rf /config/rutorrent/plugins 2>/dev/null || true
+	rm -rf '/config/rutorrent/plugins' 2>/dev/null || true
 fi
 
 # if rpc enabled then proceed, else delete
@@ -226,7 +248,7 @@ if [[ "${ENABLE_RPC2}" == "yes" ]]; then
 	# if rpc authentication enabled then add in lines
 	if [[ "${ENABLE_RPC2_AUTH}" == "yes" ]]; then
 
-		mkdir -p /config/nginx/security
+		mkdir -p '/config/nginx/security'
 
 		if [[ -z "${check_rpc2_secure}" ]]; then
 
@@ -276,7 +298,7 @@ fi
 # if web ui authentication enabled then add in lines
 if [[ "${ENABLE_WEBUI_AUTH}" == "yes" ]]; then
 
-	mkdir -p /config/nginx/security
+	mkdir -p '/config/nginx/security'
 
 	auth_file="/config/nginx/security/webui_auth"
 
@@ -322,7 +344,7 @@ fi
 echo "[info] starting php-fpm..."
 
 # run php-fpm and specify path to pid file
-/usr/bin/php-fpm --pid /home/nobody/php-fpm.pid
+/usr/bin/php-fpm --pid '/home/nobody/php-fpm.pid'
 
 echo "[info] starting nginx..."
 
@@ -330,5 +352,5 @@ echo "[info] starting nginx..."
 # Synology users - link to issue:- https://github.com/binhex/arch-rtorrentvpn/issues/138
 #
 # run nginx in foreground and specify path to pid file
-ln -f /usr/bin/nginx /home/nobody/bin/
+ln -f '/usr/bin/nginx' '/home/nobody/bin/'
 /home/nobody/bin/nginx -g "daemon off; pid /home/nobody/nginx.pid;"
