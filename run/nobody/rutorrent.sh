@@ -117,12 +117,12 @@ if [[ -f "/etc/php/php.ini" && ! -L "/etc/php/php.ini" ]]; then
 fi
 
 # if php.ini file doesnt exist then copy default to host config volume (soft linked)
-if [ ! -f "/config/rutorrent/conf/php.ini" ]; then
+if [ ! -f "/config/rutorrent/php/php.ini" ]; then
 
-	echo "[info] php.ini file doesnt exist, copying default to /config/rutorrent/conf/..."
+	echo "[info] php.ini file doesnt exist, copying default to /config/rutorrent/php/..."
 
-	mkdir -p '/config/rutorrent/conf'
-	cp '/etc/php/php.ini-backup' '/config/rutorrent/conf/php.ini'
+	mkdir -p '/config/rutorrent/php'
+	cp '/etc/php/php.ini-backup' '/config/rutorrent/php/php.ini'
 
 else
 
@@ -131,7 +131,7 @@ else
 fi
 
 # create soft link to php.ini file
-ln -fs '/config/rutorrent/conf/php.ini' '/etc/php/php.ini'
+ln -fs '/config/rutorrent/php/php.ini' '/etc/php/php.ini'
 
 # if conf folder exists in container then rename
 if [[ -d "/usr/share/webapps/rutorrent/conf" && ! -L "/usr/share/webapps/rutorrent/conf" ]]; then
