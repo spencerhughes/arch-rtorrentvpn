@@ -53,7 +53,6 @@ while true; do
 	privoxy_running="false"
 	irssi_running="false"
 	ip_change="false"
-	vpn_port_change="false"
 	rtorrent_port_change="false"
 
 	if [[ "${VPN_ENABLED}" == "yes" ]]; then
@@ -176,13 +175,6 @@ while true; do
 
 				# run script to initialise rutorrent plugins
 				source /home/nobody/initplugins.sh
-
-			fi
-
-			# if port is detected as closed then create empty file to trigger restart of openvpn process (restart code in /root/openvpn.sh)
-			if [[ "${vpn_port_change}" == "true" ]];then
-
-				touch "/tmp/portclosed"
 
 			fi
 
