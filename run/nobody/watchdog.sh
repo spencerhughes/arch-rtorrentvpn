@@ -173,8 +173,18 @@ while true; do
 				# run script to start rtorrent, it can also perform shutdown of rtorrent if its already running (required for port/ip change)
 				source /home/nobody/rtorrent.sh
 
-				# run script to initialise rutorrent plugins
-				source /home/nobody/initplugins.sh
+				# if the exit code is non 0 (bad vpn_ip due to remote server change?) then skip initplugins.sh as this will block
+				if [[ "${?}" -ne 0 ]]; then
+
+					echo "[warn] Failed to start rTorrent, skipping initialisation of ruTorrent Plugins..."
+
+				else
+
+					# run script to initialise rutorrent plugins
+					source /home/nobody/initplugins.sh
+
+				fi
+
 
 			fi
 
@@ -219,8 +229,17 @@ while true; do
 			# run script to start rtorrent
 			source /home/nobody/rtorrent.sh
 
-			# run script to initialise rutorrent plugins
-			source /home/nobody/initplugins.sh
+			# if the exit code is non 0 (bad vpn_ip due to remote server change?) then skip initplugins.sh as this will block
+			if [[ "${?}" -ne 0 ]]; then
+
+				echo "[warn] Failed to start rTorrent, skipping initialisation of ruTorrent Plugins..."
+
+			else
+
+				# run script to initialise rutorrent plugins
+				source /home/nobody/initplugins.sh
+
+			fi
 
 		fi
 
