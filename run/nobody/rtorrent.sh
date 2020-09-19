@@ -70,7 +70,8 @@ else
 	fi
 
 	# make sure process rtorrent DOES exist
-	retry_count=30
+	retry_count=12
+	retry_wait=1
 	while true; do
 
 		if ! pgrep -x "rtorrent main" > /dev/null; then
@@ -83,10 +84,11 @@ else
 			else
 
 				if [[ "${DEBUG}" == "true" ]]; then
-					echo "[debug] Waiting for rTorrent process to start..."
+					echo "[debug] Waiting for rTorrent process to start"
+					echo "[debug] Re-check in ${retry_wait} secs..."
+					echo "[debug] ${retry_count} retries left"
 				fi
-
-				sleep 1s
+				sleep "${retry_wait}s"
 
 			fi
 
