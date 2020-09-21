@@ -394,7 +394,7 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 				vpn_remote_port_cut="1194"
 			fi
 
-			vpn_remote_protocol_cut=$(cat "${VPN_CONFIG}" | grep -P -o '(?<=proto\s).*'
+			vpn_remote_protocol_cut=$(cat "${VPN_CONFIG}" | grep -P -o '(?<=proto\s).*' || true)
 			if [[ -z "${vpn_remote_protocol_cut}" ]]; then
 				vpn_remote_protocol_cut=$(echo "${vpn_remote_line_item}" | cut -d " " -f3 || true)
 				if [[ -z "${vpn_remote_protocol_cut}" ]]; then
