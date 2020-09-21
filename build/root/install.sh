@@ -394,18 +394,19 @@ if [[ $VPN_ENABLED == "yes" ]]; then
 				vpn_remote_port_cut="1194"
 			fi
 
-			vpn_remote_protocol_cut=$(echo "${vpn_remote_line_item}" | cut -d " " -f3 || true)
-
+			vpn_remote_protocol_cut=$(cat "${VPN_CONFIG}" | grep -P -o '(?<=proto\s).*'
 			if [[ -z "${vpn_remote_protocol_cut}" ]]; then
-				echo "[warn] VPN configuration file ${VPN_CONFIG} remote protocol is missing or malformed, assuming protocol 'udp'" | ts '%Y-%m-%d %H:%M:%.S'
-				vpn_remote_protocol_cut="udp"
-
-			elif [[ "${vpn_remote_protocol_cut}" == "tcp" ]]; then
+				vpn_remote_protocol_cut=$(echo "${vpn_remote_line_item}" | cut -d " " -f3 || true)
+				if [[ -z "${vpn_remote_protocol_cut}" ]]; then
+					echo "[warn] VPN configuration file ${VPN_CONFIG} remote protocol is missing or malformed, assuming protocol 'udp'" | ts '%Y-%m-%d %H:%M:%.S'
+					vpn_remote_protocol_cut="udp"
+				fi
+			fi
+			if [[ "${vpn_remote_protocol_cut}" == "tcp" ]]; then
 				# if remote line contains old format 'tcp' then replace with newer 'tcp-client' format
 				vpn_remote_protocol_cut="tcp-client"
-
 			fi
-			
+
 			vpn_remote_server+="${vpn_remote_server_cut},"
 			vpn_remote_port+="${vpn_remote_port_cut},"
 			vpn_remote_protocol+="${vpn_remote_protocol_cut},"
