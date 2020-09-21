@@ -99,8 +99,12 @@ iptables -A INPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j ACC
 # iterate over array and add all remote vpn ports and protocols
 for index in "${!vpn_remote_port_list[@]}"; do
 
-	# accept input to vpn gateway
-	iptables -A INPUT -i "${docker_interface}" -p "${vpn_remote_protocol_list[$index]}" --sport "${vpn_remote_port_list[$index]}" -j ACCEPT
+	# note grep -e is required to indicate no flags follow to prevent -A from being incorrectly picked up
+	rule_exists=$(iptables -S | grep -e "-A INPUT -i "${docker_interface}" -p "${vpn_remote_protocol_list[$index]}" -m "${vpn_remote_protocol_list[$index]}" --sport "${vpn_remote_port_list[$index]}" -j ACCEPT")
+	if [[ -z "${rule_exists}" ]]; then
+		# accept input to vpn gateway
+		iptables -A INPUT -i "${docker_interface}" -p "${vpn_remote_protocol_list[$index]}" --sport "${vpn_remote_port_list[$index]}" -j ACCEPT
+	fi
 
 done
 
@@ -183,8 +187,12 @@ iptables -A OUTPUT -s "${docker_network_cidr}" -d "${docker_network_cidr}" -j AC
 # iterate over array and add all remote vpn ports and protocols
 for index in "${!vpn_remote_port_list[@]}"; do
 
-	# accept output from vpn gateway
-	iptables -A OUTPUT -o "${docker_interface}" -p "${vpn_remote_protocol_list[$index]}" --dport "${vpn_remote_port_list[$index]}" -j ACCEPT
+	# note grep -e is required to indicate no flags follow to prevent -A from being incorrectly picked up
+	rule_exists=$(iptables -S | grep -e "-A OUTPUT -o "${docker_interface}" -p "${vpn_remote_protocol_list[$index]}" -m "${vpn_remote_protocol_list[$index]}" --dport "${vpn_remote_port_list[$index]}" -j ACCEPT")
+	if [[ -z "${rule_exists}" ]]; then
+		# accept output from vpn gateway
+		iptables -A OUTPUT -o "${docker_interface}" -p "${vpn_remote_protocol_list[$index]}" --dport "${vpn_remote_port_list[$index]}" -j ACCEPT
+	fi
 
 done
 
