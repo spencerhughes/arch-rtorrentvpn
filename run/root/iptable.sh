@@ -1,12 +1,14 @@
 #!/bin/bash
 
-# identify docker bridge interface name by looking at routing to
-# vpn provider remote endpoint (first ip address from name 
-# lookup in /root/start.sh)
-docker_interface=$(ip route show to match "${remote_dns_answer_first}" | grep -P -o -m 1 '[a-zA-Z0-9]+\s?+$' | tr -d '[:space:]')
+# identify docker bridge interface name by looking at defult route
+docker_interface=$(ip -4 route ls | grep default | xargs | grep -o -P '[^\s]+$')
 if [[ "${DEBUG}" == "true" ]]; then
 	echo "[debug] Docker interface defined as ${docker_interface}"
 fi
+
+# identify ip for local gateway (eth0)
+default_gateway=$(ip route show default | awk '/default/ {print $3}')
+echo "[info] Default route for container is ${default_gateway}"
 
 # identify ip for docker bridge interface
 docker_ip=$(ifconfig "${docker_interface}" | grep -P -o -m 1 '(?<=inet\s)[^\s]+')
@@ -37,7 +39,7 @@ for lan_network_item in "${lan_network_list[@]}"; do
 	lan_network_item=$(echo "${lan_network_item}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 
 	echo "[info] Adding ${lan_network_item} as route via docker ${docker_interface}"
-	ip route add "${lan_network_item}" via "${DEFAULT_GATEWAY}" dev "${docker_interface}"
+	ip route add "${lan_network_item}" via "${default_gateway}" dev "${docker_interface}"
 
 done
 
@@ -55,21 +57,21 @@ fi
 
 # check we have iptable_mangle, if so setup fwmark
 lsmod | grep iptable_mangle
-iptable_mangle_exit_code=$?
+iptable_mangle_exit_code="${?}"
 
-if [[ $iptable_mangle_exit_code == 0 ]]; then
+if [[ "${iptable_mangle_exit_code}" == 0 ]]; then
 
 	echo "[info] iptable_mangle support detected, adding fwmark for tables"
 
 	# setup route for rutorrent http using set-mark to route traffic for port 80 to lan
 	echo "9080    rutorrent_http" >> /etc/iproute2/rt_tables
 	ip rule add fwmark 1 table rutorrent_http
-	ip route add default via $DEFAULT_GATEWAY table rutorrent_http
+	ip route add default via "${default_gateway}" table rutorrent_http
 
 	# setup route for rutorrent https using set-mark to route traffic for port 443 to lan
 	echo "9443    rutorrent_https" >> /etc/iproute2/rt_tables
 	ip rule add fwmark 2 table rutorrent_https
-	ip route add default via $DEFAULT_GATEWAY table rutorrent_https
+	ip route add default via "${default_gateway}" table rutorrent_https
 
 fi
 
@@ -150,7 +152,7 @@ for lan_network_item in "${lan_network_list[@]}"; do
 	iptables -A INPUT -i "${docker_interface}" -s "${lan_network_item}" -p tcp --dport 5000 -j ACCEPT
 
 	# accept input to privoxy if enabled
-	if [[ $ENABLE_PRIVOXY == "yes" ]]; then
+	if [[ "${ENABLE_PRIVOXY}" == "yes" ]]; then
 		iptables -A INPUT -i "${docker_interface}" -p tcp -s "${lan_network_item}" -d "${docker_network_cidr}" -j ACCEPT
 	fi
 
@@ -206,7 +208,7 @@ for index in "${!vpn_remote_port_list[@]}"; do
 done
 
 # if iptable mangle is available (kernel module) then use mark
-if [[ $iptable_mangle_exit_code == 0 ]]; then
+if [[ "${iptable_mangle_exit_code}" == 0 ]]; then
 
 	# accept output from rutorrent port 9080 - used for external access
 	iptables -t mangle -A OUTPUT -p tcp --dport 9080 -j MARK --set-mark 1
@@ -258,7 +260,7 @@ for lan_network_item in "${lan_network_list[@]}"; do
 	iptables -A OUTPUT -o "${docker_interface}" -d "${lan_network_item}" -p tcp --sport 5000 -j ACCEPT
 
 	# accept output from privoxy if enabled - used for lan access
-	if [[ $ENABLE_PRIVOXY == "yes" ]]; then
+	if [[ "${ENABLE_PRIVOXY}" == "yes" ]]; then
 		iptables -A OUTPUT -o "${docker_interface}" -p tcp -s "${docker_network_cidr}" -d "${lan_network_item}" -j ACCEPT
 	fi
 
