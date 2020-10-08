@@ -185,6 +185,7 @@ If there are multiple ovpn files then please delete the ones you don't want to u
 
 **WireGuard**  
 If you wish to use WireGuard (defined via 'VPN_CLIENT' env var value ) then due to the enhanced security and kernel integration WireGuard will require the container to be defined with privileged permissions, so please ensure you change the following docker flag:-  
+&nbsp;
 from
 ```
     --cap-add=NET_ADMIN \
