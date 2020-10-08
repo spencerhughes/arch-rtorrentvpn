@@ -3,8 +3,9 @@
 [rTorrent-ps](https://github.com/pyroscope/rtorrent-ps)  
 [ruTorrent](https://github.com/Novik/ruTorrent)  
 [autodl-irssi](https://github.com/autodl-community/autodl-irssi)  
+[Privoxy](http://www.privoxy.org/)  
 [OpenVPN](https://openvpn.net/)  
-[Privoxy](http://www.privoxy.org/)
+[WireGuard](https://www.wireguard.com/)
 
 **Description**
 
@@ -12,10 +13,11 @@ rTorrent is a quick and efficient BitTorrent client that uses, and is in develop
 
 **Build notes**
 
-Latest stable rTorrent-ps release from Arch Linux AUR.
-Latest stable ruTorrent release from Arch Linux AUR.
-Latest stable OpenVPN release from Arch Linux repo.
-Latest stable Privoxy release from Arch Linux repo.
+Latest stable rTorrent-ps release from Arch Linux AUR.  
+Latest stable ruTorrent release from Arch Linux AUR.  
+Latest stable Privoxy release from Arch Linux repo.  
+Latest stable OpenVPN release from Arch Linux repo.  
+Latest stable WireGuard release from Arch Linux repo.
 
 **!!! IMPORTANT !!!**
 
@@ -39,6 +41,7 @@ docker run -d \
     -e VPN_USER=<vpn username> \
     -e VPN_PASS=<vpn password> \
     -e VPN_PROV=<pia|airvpn|custom> \
+    -e VPN_CLIENT=<openvpn|wireguard> \
     -e VPN_OPTIONS=<additional openvpn cli options> \
     -e STRICT_PORT_FORWARD=<yes|no> \
     -e ENABLE_PRIVOXY=<yes|no> \
@@ -93,6 +96,7 @@ docker run -d \
     -e VPN_USER=myusername \
     -e VPN_PASS=mypassword \
     -e VPN_PROV=pia \
+    -e VPN_CLIENT=openvpn \
     -e STRICT_PORT_FORWARD=yes \
     -e ENABLE_PRIVOXY=yes \
     -e ENABLE_AUTODL_IRSSI=yes \
@@ -146,6 +150,7 @@ docker run -d \
     -v /etc/localtime:/etc/localtime:ro \
     -e VPN_ENABLED=yes \
     -e VPN_PROV=airvpn \
+    -e VPN_CLIENT=openvpn \
     -e ENABLE_PRIVOXY=yes \
     -e ENABLE_AUTODL_IRSSI=yes \
     -e ENABLE_RPC2=yes \
@@ -166,8 +171,8 @@ docker run -d \
     binhex/arch-rtorrentvpn
 ```
 &nbsp;
-**Notes**
 
+**OpenVPN**  
 Please note this Docker image does not include the required OpenVPN configuration file and certificates. These will typically be downloaded from your VPN providers website (look for OpenVPN configuration files), and generally are zipped.
 
 PIA users - The URL to download the OpenVPN configuration files and certs is:-
@@ -178,6 +183,18 @@ Once you have downloaded the zip (normally a zip as they contain multiple ovpn f
 
 If there are multiple ovpn files then please delete the ones you don't want to use (normally filename follows location of the endpoint) leaving just a single ovpn file and the certificates referenced in the ovpn file (certificates will normally have a crt and/or pem extension).
 
+**WireGuard**  
+Due to the enhanced security and kernel integration, WireGuard will require the container to be defined with privileged permissions, so please ensure you change the following
+from:-
+```
+    --cap-add=NET_ADMIN \
+```
+to
+```
+    --privileged=true \
+```
+
+**Notes**  
 Due to Google and OpenDNS supporting EDNS Client Subnet it is recommended NOT to use either of these NS providers.
 The list of default NS providers in the above example(s) is as follows:-
 
