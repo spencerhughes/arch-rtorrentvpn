@@ -27,7 +27,7 @@ fi
 libtorrentps_package_name="libtorrent-ps.tar.xz"
 
 # download compiled libtorrent-ps (used by rtorrent-ps)
-curly.sh -of "/tmp/${libtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/${OS_ARCH}/${libtorrentps_package_name}"
+rcurl.sh -o "/tmp/${libtorrentps_package_name}" "https://github.com/binhex/arch-packages/raw/master/compiled/${OS_ARCH}/${libtorrentps_package_name}"
 
 # install libtorrent-ps
 pacman -U "/tmp/${libtorrentps_package_name}" --noconfirm
@@ -35,7 +35,7 @@ pacman -U "/tmp/${libtorrentps_package_name}" --noconfirm
 rtorrentps_package_name="rtorrent-ps.tar.xz"
 
 # download compiled rtorrent-ps (cannot compile during docker build)
-curly.sh -of "/tmp/${rtorrentps_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/compiled/${OS_ARCH}/${rtorrentps_package_name}"
+rcurl.sh -o "/tmp/${rtorrentps_package_name}" "https://github.com/binhex/arch-packages/raw/master/compiled/${OS_ARCH}/${rtorrentps_package_name}"
 
 # install rtorrent-ps
 pacman -U "/tmp/${rtorrentps_package_name}" --noconfirm
@@ -46,7 +46,7 @@ echo 'set -g default-terminal "screen-256color"' > /home/nobody/.tmux.conf
 ffmpeg_package_name="ffmpeg-release-static.tar.xz"
 
 # download statically linked ffmpeg (used by rutorrent screenshots plugin)
-curly.sh -of "/tmp/${ffmpeg_package_name}" -url "https://github.com/binhex/arch-packages/raw/master/static/${OS_ARCH}/${ffmpeg_package_name}"
+rcurl.sh -o "/tmp/${ffmpeg_package_name}" "https://github.com/binhex/arch-packages/raw/master/static/${OS_ARCH}/${ffmpeg_package_name}"
 
 # unpack and move binaries
 mkdir -p "/tmp/unpack" && tar -xvf "/tmp/${ffmpeg_package_name}" -C "/tmp/unpack"
@@ -106,7 +106,7 @@ pacman -S --needed gcc --noconfirm
 github.sh --install-path "/usr/share/webapps/rutorrent/plugins/autodl-irssi" --github-owner "autodl-community" --github-repo "autodl-rutorrent"
 
 # download htpasswd (problems with apache-tools and openssl 1.1.x)
-curly.sh -of /tmp/htpasswd.tar.gz -url "https://github.com/binhex/arch-packages/raw/master/compiled/${OS_ARCH}/htpasswd.tar.gz"
+rcurl.sh -o /tmp/htpasswd.tar.gz "https://github.com/binhex/arch-packages/raw/master/compiled/${OS_ARCH}/htpasswd.tar.gz"
 
 # extract compiled version of htpasswd
 tar -xvf /tmp/htpasswd.tar.gz -C /
