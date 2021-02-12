@@ -53,17 +53,30 @@ rcurl.sh -o "/tmp/${ffmpeg_package_name}" "https://github.com/binhex/arch-packag
 mkdir -p "/tmp/unpack" && tar -xvf "/tmp/${ffmpeg_package_name}" -C "/tmp/unpack"
 mv /tmp/unpack/ffmpeg*/ff* "/usr/bin/"
 
-# github release - libtorrent
+# aur compiled package - libtorrent-ps
 ####
 
-# download and compile libtorrent
-github.sh --install-path '/tmp/libtorrent/src' --github-owner 'rakshasa' --github-repo 'rtorrent' --download-assets "libtorrent.*tar.gz" --query-type 'release' --compile-src "cd /tmp/libtorrent/src/libtorrent* && sed '/AM_PATH_CPPUNIT/d' -i configure.ac && ./autogen.sh && export CXXFLAGS=\"${CXXFLAGS} -std=c++11 -fno-strict-aliasing\" && ./configure --prefix=/usr --disable-debug && make && make DESTDIR='/' install"
+libtorrentps_package_name="libtorrent-ps.tar.xz"
 
-# github release - rtorrent
+# download compiled libtorrent-ps (used by rtorrent-ps)
+rcurl.sh -o "/tmp/${libtorrentps_package_name}" "https://github.com/binhex/arch-packages/raw/master/compiled/${OS_ARCH}/${libtorrentps_package_name}"
+
+# install libtorrent-ps
+pacman -U "/tmp/${libtorrentps_package_name}" --noconfirm
+
+# aur compiled package - rtorrent-ps
 ####
 
-# download and compile rtorrent
-github.sh --install-path '/tmp/rtorrent/src' --github-owner 'rakshasa' --github-repo 'rtorrent' --download-assets "rtorrent.*tar.gz" --query-type 'release' --compile-src "cd /tmp/rtorrent/src/rtorrent* && sed '/AM_PATH_CPPUNIT/d' -i configure.ac && ./autogen.sh && export CXXFLAGS=\"${CXXFLAGS} -std=c++11 -fno-strict-aliasing\" && ./configure --prefix=/usr --disable-debug --with-xmlrpc-c && make && make DESTDIR='/' install"
+rtorrentps_package_name="rtorrent-ps.tar.xz"
+
+# download compiled rtorrent-ps (cannot compile during docker build)
+rcurl.sh -o "/tmp/${rtorrentps_package_name}" "https://github.com/binhex/arch-packages/raw/master/compiled/${OS_ARCH}/${rtorrentps_package_name}"
+
+# install rtorrent-ps
+pacman -U "/tmp/${rtorrentps_package_name}" --noconfirm
+
+# set tmux to use 256 colors (required by rtorrent-ps)
+echo 'set -g default-terminal "screen-256color"' > /home/nobody/.tmux.conf
 
 # github release - rutorrent
 ####
@@ -94,6 +107,9 @@ tar -xvf /tmp/htpasswd.tar.gz -C /
 # see here for details:-
 # https://unix.stackexchange.com/questions/233275/hard-link-creation-permissions
 chmod 777 /usr/bin/nginx
+
+# manually create folder, used to create symlinks to nginx binary
+mkdir -p "/home/nobody/bin"
 
 # config - php
 ####
