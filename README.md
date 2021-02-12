@@ -1,6 +1,6 @@
 **Application**
 
-[rTorrent](https://github.com/rakshasa/rtorrent)  
+[rTorrent-ps](https://github.com/pyroscope/rtorrent-ps)  
 [ruTorrent](https://github.com/Novik/ruTorrent)  
 [autodl-irssi](https://github.com/autodl-community/autodl-irssi)  
 [Privoxy](http://www.privoxy.org/)  
@@ -15,7 +15,7 @@ This Docker includes OpenVPN and WireGuard to ensure a secure and private connec
 
 **Build notes**
 
-Latest stable rTorrent release from GitHub.  
+Latest stable rTorrent-ps release from Arch Linux AUR.  
 Latest stable ruTorrent release from Arch Linux AUR.  
 Latest stable Privoxy release from Arch Linux repo.  
 Latest stable OpenVPN release from Arch Linux repo.  
