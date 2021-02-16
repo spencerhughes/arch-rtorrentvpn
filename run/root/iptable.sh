@@ -115,7 +115,11 @@ for vpn_remote_port_item in "${vpn_remote_port_list[@]}"; do
 
 done
 
-# accept input to rutorrent port 9443
+# accept input from rutorrent port 9080 - used for lan access
+iptables -A INPUT -i "${docker_interface}" -p tcp --dport 9080 -j ACCEPT
+iptables -A INPUT -i "${docker_interface}" -p tcp --sport 9080 -j ACCEPT
+
+# accept input to rutorrent port 9443 - used for lan access
 iptables -A INPUT -i "${docker_interface}" -p tcp --dport 9443 -j ACCEPT
 iptables -A INPUT -i "${docker_interface}" -p tcp --sport 9443 -j ACCEPT
 
