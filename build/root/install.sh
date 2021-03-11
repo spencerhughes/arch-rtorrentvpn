@@ -349,6 +349,9 @@ if [[ "${ENABLE_RPC2}" == "yes" ]]; then
 				# run through base64, and then output the top 16 characters to a file.
 				date +%s | sha256sum | base64 | head -c 16 > "${rpc2_pass_file}"
 			fi
+			# change owner as we write to "/config/nginx" later on.
+			chown -R "${PUID}":"${PGID}" "/config/nginx"
+
 			echo "[warn] RPC2_PASS not defined (via -e RPC2_PASS), using randomised password (password stored in '${rpc2_pass_file}')" | ts '%Y-%m-%d %H:%M:%.S'
 			export RPC2_PASS="$(cat ${rpc2_pass_file})"
 		fi
@@ -388,6 +391,9 @@ if [[ "${ENABLE_WEBUI_AUTH}" == "yes" ]]; then
 			# run through base64, and then output the top 16 characters to a file.
 			date +%s | sha256sum | base64 | head -c 16 > "${webui_pass_file}"
 		fi
+		# change owner as we write to "/config/nginx" later on.
+		chown -R "${PUID}":"${PGID}" "/config/nginx"
+
 		echo "[warn] WEBUI_PASS not defined (via -e WEBUI_PASS), using randomised password (password stored in '${webui_pass_file}')" | ts '%Y-%m-%d %H:%M:%.S'
 		export WEBUI_PASS="$(cat ${webui_pass_file})"
 	fi
