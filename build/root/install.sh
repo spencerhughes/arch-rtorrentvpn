@@ -342,6 +342,7 @@ if [[ "${ENABLE_RPC2}" == "yes" ]]; then
 				echo "[info] RPC2_PASS defined as '${RPC2_PASS}'" | ts '%Y-%m-%d %H:%M:%.S'
 			fi
 		else
+			mkdir -p "/config/nginx/security"
 			rpc2_pass_file="/config/nginx/security/rpc2_pass"
 			if [ ! -f "${rpc2_pass_file}" ]; then
 				# generate random password for web ui using SHA to hash the date,
@@ -380,6 +381,7 @@ if [[ "${ENABLE_WEBUI_AUTH}" == "yes" ]]; then
 			echo "[info] WEBUI_PASS defined as '${WEBUI_PASS}'" | ts '%Y-%m-%d %H:%M:%.S'
 		fi
 	else
+		mkdir -p "/config/nginx/security"
 		webui_pass_file="/config/nginx/security/webui_pass"
 		if [ ! -f "${webui_pass_file}" ]; then
 			# generate random password for web ui using SHA to hash the date,
