@@ -2,6 +2,27 @@
 # ~/.rtorrent.rc and enable/modify the options as needed. Remember to
 # uncomment the options you wish to enable.
 
+# rTorrent log file locations
+execute = {/bin/bash,-c,mkdir -p /config/rtorrent/logs}
+log.open_file = "rtorrent", /config/rtorrent/logs/rtorrent.log
+log.open_file = "tracker", /config/rtorrent/logs/tracker.log
+log.open_file = "storage", /config/rtorrent/logs/storage.log
+
+# rTorrent logging verbosity for rtorrent, comment out if logs are too chatty
+log.add_output = "info", "rtorrent"
+log.add_output = "critical", "rtorrent"
+log.add_output = "error", "rtorrent"
+log.add_output = "warn", "rtorrent"
+log.add_output = "notice", "rtorrent"
+log.add_output = "debug", "rtorrent"
+
+# rTorrent logging for dht and tracker traffic
+log.add_output = "dht_debug", "tracker"
+log.add_output = "tracker_debug", "tracker"
+  
+# rTorrent logging for storage
+log.add_output = "storage_debug", "storage"
+
 # Maximum number of simultaneous downloads and uploads slots (global slots!) (`max_downloads_global`, `max_uploads_global`)
 #
 #throttle.max_downloads.global.set = 300
