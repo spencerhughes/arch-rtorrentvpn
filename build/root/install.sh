@@ -164,11 +164,18 @@ echo "" >> "${php_fpm_ini}"
 echo "; Specify user listener group" >> "${php_fpm_ini}"
 echo "listen.group = users" >> "${php_fpm_ini}"
 
-# setup softlinks from php7 to stripped version name
-ln -s /usr/bin/php7 /usr/bin/php
-ln -s /usr/bin/php-fpm7 /usr/bin/php-fpm
-ln -s /usr/bin/php-config7 /usr/bin/php-config
-ln -s /usr/bin/phpize7 /usr/bin/phpize
+# setup softlinks from php7 to stripped version name, this is required
+# as php v8 is now latest and therefore all php v7 binaries have been
+# renamed with the '7' suffix to denote the difference from v8
+ln -s '/usr/bin/php7' '/usr/bin/php'
+ln -s '/usr/bin/php-fpm7' '/usr/bin/php-fpm'
+ln -s '/usr/bin/php-config7' '/usr/bin/php-config'
+ln -s '/usr/bin/phpize7' '/usr/bin/phpize'
+
+# copy v7 config files as we reference stripped version names in rutorrent.sh
+mkdir -p /etc/php
+cp "${php_ini}" '/etc/php/php.ini'
+cp "${php_fpm_ini}" '/etc/php/php-fpm.conf'
 
 # config - rutorrent
 ####
@@ -250,7 +257,7 @@ ln -s /usr/share/autodl-irssi/autodl-irssi.pl .
 ####
 
 # define comma separated list of paths 
-install_paths="/usr/share/webapps,/usr/share/nginx/html,/etc/nginx,/etc/php7,/var/lib/nginx,/var/log/nginx,/etc/privoxy,/home/nobody,/usr/share/autodl-irssi"
+install_paths="/usr/share/webapps,/usr/share/nginx/html,/etc/nginx,/etc/php7,/etc/php,/var/lib/nginx,/var/log/nginx,/etc/privoxy,/home/nobody,/usr/share/autodl-irssi"
 
 # split comma separated string into list for install paths
 IFS=',' read -ra install_paths_list <<< "${install_paths}"
