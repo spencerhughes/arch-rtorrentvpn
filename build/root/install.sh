@@ -56,7 +56,7 @@ mv /tmp/unpack/ffmpeg*/ff* "/usr/bin/"
 ####
 
 # define pacman packages
-pacman_packages="git nginx php7 php7-fpm rsync openssl tmux mediainfo php7-geoip zip libx264 libvpx xmlrpc-c sox python2 python-pip"
+pacman_packages="git nginx php-fpm rsync openssl tmux mediainfo php-geoip zip libx264 libvpx xmlrpc-c sox python2 python-pip"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
@@ -123,7 +123,7 @@ chmod 777 /usr/bin/nginx
 # config - php
 ####
 
-php_ini="/etc/php7/php.ini"
+php_ini="/etc/php/php.ini"
 
 # configure php memory limit to improve performance
 sed -i -e "s~.*memory_limit\s\=\s.*~memory_limit = 768M~g" "${php_ini}"
@@ -150,7 +150,7 @@ sed -i -e "/.*extension=gd/a extension=geoip" "${php_ini}"
 sed -i -e "s~.*extension=sockets~extension=sockets~g" "${php_ini}"
 
 # configure php-fpm to use tcp/ip connection for listener
-php_fpm_ini="/etc/php7/php-fpm.conf"
+php_fpm_ini="/etc/php/php-fpm.conf"
 
 echo "" >> "${php_fpm_ini}"
 echo "; Set php-fpm to use tcp/ip connection" >> "${php_fpm_ini}"
@@ -163,12 +163,6 @@ echo "listen.owner = nobody" >> "${php_fpm_ini}"
 echo "" >> "${php_fpm_ini}"
 echo "; Specify user listener group" >> "${php_fpm_ini}"
 echo "listen.group = users" >> "${php_fpm_ini}"
-
-# setup softlinks from php7 to stripped version name
-ln -s /usr/bin/php7 /usr/bin/php
-ln -s /usr/bin/php-fpm7 /usr/bin/php-fpm
-ln -s /usr/bin/php-config7 /usr/bin/php-config
-ln -s /usr/bin/phpize7 /usr/bin/phpize
 
 # config - rutorrent
 ####
@@ -250,7 +244,7 @@ ln -s /usr/share/autodl-irssi/autodl-irssi.pl .
 ####
 
 # define comma separated list of paths 
-install_paths="/usr/share/webapps,/usr/share/nginx/html,/etc/nginx,/etc/php7,/var/lib/nginx,/var/log/nginx,/etc/privoxy,/home/nobody,/usr/share/autodl-irssi"
+install_paths="/usr/share/webapps,/usr/share/nginx/html,/etc/nginx,/etc/php,/run/php-fpm,/var/lib/nginx,/var/log/nginx,/etc/privoxy,/home/nobody,/usr/share/autodl-irssi"
 
 # split comma separated string into list for install paths
 IFS=',' read -ra install_paths_list <<< "${install_paths}"
