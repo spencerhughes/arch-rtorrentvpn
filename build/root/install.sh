@@ -207,6 +207,10 @@ sed -i -e "s~\$updateInterval \= 60\;~\$updateInterval \= 10\;~g" "${rutorrent_p
 # set the rutorrent diskspace plugin to point at the /data volume mapping, default is /
 sed -i -e "s~\$partitionDirectory \= \&\$topDirectory\;~\$partitionDirectory \= \"/data\";~g" "${rutorrent_plugins_path}/diskspace/conf.php"
 
+# delme - hack to remove test -x, as this is causing plugin failure for certain users (cannot reproduce at present)
+sed -i -e 's~test -x.*&&\s~~g' '/usr/share/webapps/rutorrent/php/test.sh'
+# /delme
+
 # config - autodl-irssi
 ####
 
