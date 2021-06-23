@@ -1,24 +1,24 @@
 **Application**
 
-[rTorrent-ps](https://github.com/pyroscope/rtorrent-ps)  
-[ruTorrent](https://github.com/Novik/ruTorrent)  
-[autodl-irssi](https://github.com/autodl-community/autodl-irssi)  
-[Privoxy](http://www.privoxy.org/)  
-[OpenVPN](https://openvpn.net/)  
+[rTorrent-ps](https://github.com/pyroscope/rtorrent-ps)<br/>
+[ruTorrent](https://github.com/Novik/ruTorrent)<br/>
+[autodl-irssi](https://github.com/autodl-community/autodl-irssi)<br/>
+[Privoxy](http://www.privoxy.org/)<br/>
+[OpenVPN](https://openvpn.net/)<br/>
 [WireGuard](https://www.wireguard.com/)
 
 **Description**
 
-rTorrent is a quick and efficient BitTorrent client that uses, and is in development alongside, the libTorrent (not to be confused with libtorrent-rasterbar) library. It is written in C++ and uses the ncurses programming library, which means it uses a text user interface. When combined with a terminal multiplexer (e.g. GNU Screen or Tmux) and Secure Shell, it becomes a convenient remote BitTorrent client, this Docker image includes the popular ruTorrent web frontend to rTorrent for ease of use.  
+rTorrent is a quick and efficient BitTorrent client that uses, and is in development alongside, the libTorrent (not to be confused with libtorrent-rasterbar) library. It is written in C++ and uses the ncurses programming library, which means it uses a text user interface. When combined with a terminal multiplexer (e.g. GNU Screen or Tmux) and Secure Shell, it becomes a convenient remote BitTorrent client, this Docker image includes the popular ruTorrent web frontend to rTorrent for ease of use.<br/>
 
 This Docker includes OpenVPN and WireGuard to ensure a secure and private connection to the Internet, including use of iptables to prevent IP leakage when the tunnel is down. It also includes Privoxy to allow unfiltered access to index sites, to use Privoxy please point your application at `http://<host ip>:8118`.
 
 **Build notes**
 
-Latest stable rTorrent-ps release from Arch Linux AUR.  
-Latest stable ruTorrent release from Arch Linux AUR.  
-Latest stable Privoxy release from Arch Linux repo.  
-Latest stable OpenVPN release from Arch Linux repo.  
+Latest stable rTorrent-ps release from Arch Linux AUR.<br/>
+Latest stable ruTorrent release from Arch Linux AUR.<br/>
+Latest stable Privoxy release from Arch Linux repo.<br/>
+Latest stable OpenVPN release from Arch Linux repo.<br/>
 Latest stable WireGuard release from Arch Linux repo.
 
 **!!! IMPORTANT !!!**
@@ -77,7 +77,7 @@ or
 
 `https://<host ip>:9443/`
 
-Username:- Value of 'WEBUI_USER'  
+Username:- Value of 'WEBUI_USER'<br/>
 Password:- Value of 'WEBUI_PASS'
 
 **Access Privoxy**
@@ -177,10 +177,10 @@ docker run -d \
 ```
 &nbsp;
 
-**IMPORTANT**  
+**IMPORTANT**<br/>
 Please note 'VPN_INPUT_PORTS' is **NOT** to define the incoming port for the VPN, this environment variable is used to define port(s) you want to allow in to the VPN network when network binding multiple containers together, configuring this incorrectly with the VPN provider assigned incoming port COULD result in IP leakage, you have been warned!.
 
-**OpenVPN**  
+**OpenVPN**<br/>
 Please note this Docker image does not include the required OpenVPN configuration file and certificates. These will typically be downloaded from your VPN providers website (look for OpenVPN configuration files), and generally are zipped.
 
 PIA users - The URL to download the OpenVPN configuration files and certs is:-
@@ -191,8 +191,8 @@ Once you have downloaded the zip (normally a zip as they contain multiple ovpn f
 
 If there are multiple ovpn files then please delete the ones you don't want to use (normally filename follows location of the endpoint) leaving just a single ovpn file and the certificates referenced in the ovpn file (certificates will normally have a crt and/or pem extension).
 
-**WireGuard**  
-If you wish to use WireGuard (defined via 'VPN_CLIENT' env var value ) then due to the enhanced security and kernel integration WireGuard will require the container to be defined with privileged permissions and sysctl support, so please ensure you change the following docker options:-    
+**WireGuard**<br/>
+If you wish to use WireGuard (defined via 'VPN_CLIENT' env var value ) then due to the enhanced security and kernel integration WireGuard will require the container to be defined with privileged permissions and sysctl support, so please ensure you change the following docker options:-  <br/>
 
 from
 ```
@@ -208,7 +208,7 @@ PIA users - The WireGuard configuration file will be auto generated and will be 
 
 Other users - Please download your WireGuard configuration file from your VPN provider, start and stop the container to generate the folder ```/config/wireguard/``` and then place your WireGuard configuration file in there.
 
-**Notes**  
+**Notes**<br/>
 Due to Google and OpenDNS supporting EDNS Client Subnet it is recommended NOT to use either of these NS providers.
 The list of default NS providers in the above example(s) is as follows:-
 
