@@ -30,12 +30,6 @@ RUN chmod +x /root/*.sh /home/nobody/*.sh && \
 # add pyrocore symlinks to path - symlinks from /opt/pyrocore to /home/nobody/bin
 ENV PATH="${PATH}:/home/nobody/bin"
 
-# map /config to host defined config path (used to store configuration from app)
-VOLUME /config
-
-# map /data to host defined data path (used to store data from app)
-VOLUME /data
-
 # expose port for scgi
 EXPOSE 5000
 
