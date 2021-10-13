@@ -3,6 +3,9 @@
 # exit script if return code != 0
 set -e
 
+# release tag name from build arg, stripped of build ver using string manipulation
+release_tag_name="${1//-[0-9][0-9]/}"
+
 # note do NOT download build scripts - inherited from int script with envvars common defined
 
 # detect image arch
@@ -174,12 +177,12 @@ rutorrent_plugins_path="${rutorrent_root_path}/plugins"
 
 # remove external applications section from default config.php
 # note this removes the lines between the patterns but not the
-# pattern itself, as this is then used as an anchor for the 
+# pattern itself, as this is then used as an anchor for the
 # re-insertion of the defined section (see next block).
 sed -i '/$pathToExternals = array(/,/);/{//!d}' "${rutorrent_config_path}/config.php"
 
 # defines paths to external applications in default config.php
-# this uses the pattern as an anchor point from the previous 
+# this uses the pattern as an anchor point from the previous
 # command
 # note the use of single quoted string to reduce escaping,
 # also note the use of unicode hex char '\x27' which is a
@@ -247,7 +250,7 @@ ln -s /usr/share/autodl-irssi/autodl-irssi.pl .
 # container perms
 ####
 
-# define comma separated list of paths 
+# define comma separated list of paths
 install_paths="/usr/share/webapps,/usr/share/nginx/html,/etc/nginx,/etc/php,/run/php-fpm,/var/lib/nginx,/var/log/nginx,/etc/privoxy,/home/nobody,/usr/share/autodl-irssi"
 
 # split comma separated string into list for install paths
@@ -277,7 +280,7 @@ cat <<EOF > /tmp/permissions_heredoc
 previous_puid=\$(cat "/root/puid" 2>/dev/null || true)
 previous_pgid=\$(cat "/root/pgid" 2>/dev/null || true)
 
-# if first run (no puid or pgid files in /tmp) or the PUID or PGID env vars are different 
+# if first run (no puid or pgid files in /tmp) or the PUID or PGID env vars are different
 # from the previous run then re-apply chown with current PUID and PGID values.
 if [[ ! -f "/root/puid" || ! -f "/root/pgid" || "\${previous_puid}" != "\${PUID}" || "\${previous_pgid}" != "\${PGID}" ]]; then
 
