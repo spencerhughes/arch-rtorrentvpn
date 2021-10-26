@@ -49,7 +49,7 @@ echo 'set -g default-terminal "screen-256color"' > /home/nobody/.tmux.conf
 ffmpeg_package_name="ffmpeg-release-static.tar.xz"
 
 # download statically linked ffmpeg (used by rutorrent screenshots plugin)
-rcurl.sh -o "/tmp/${ffmpeg_package_name}" "https://github.com/binhex/packages/raw/master/static/${OS_ARCH}/${ffmpeg_package_name}"
+rcurl.sh -o "/tmp/${ffmpeg_package_name}" "https://github.com/binhex/packages/raw/master/static/${OS_ARCH}/ffmpeg/johnvansickle/${ffmpeg_package_name}"
 
 # unpack and move binaries
 mkdir -p "/tmp/unpack" && tar -xvf "/tmp/${ffmpeg_package_name}" -C "/tmp/unpack"
