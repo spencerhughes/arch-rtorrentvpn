@@ -14,7 +14,7 @@ if [[ "${location}" == "/RPC2" ]]; then
             # inserts location (basic auth) into existing nginx.conf
             sed -i "s~location ${location} {~location ${location} {\\
             include scgi_params;\\
-            scgi_pass 127.0.0.1:5000;\\
+            scgi_pass unix:/tmp/rpc.socket;\\
             auth_basic \"Restricted Content\";\\
             auth_basic_user_file ${auth_file};~g" '/config/nginx/config/nginx.conf'
 
@@ -23,7 +23,7 @@ if [[ "${location}" == "/RPC2" ]]; then
             # inserts location (no auth) into existing nginx.conf
             sed -i "s~location ${location} {~location ${location} {\\
             include scgi_params;\\
-            scgi_pass 127.0.0.1:5000;~g" '/config/nginx/config/nginx.conf'
+            scgi_pass unix:/tmp/rpc.socket;~g" '/config/nginx/config/nginx.conf'
 
     fi
 
