@@ -101,13 +101,13 @@ else
 
 	done
 
-	echo "[info] Waiting for rTorrent process to start listening on port 5000..."
+	echo "[info] Waiting for rTorrent process to start listening on /tmp/rpc.socket..."
 
-	while [[ $(netstat -lnt | awk '$6 == "LISTEN" && $4 ~ ".5000"') == "" ]]; do
+	while [[ $(netstat -lxp | awk '$7 == "LISTENING" && $10 == "/tmp/rpc.socket"') == "" ]]; do
 		sleep 0.1
 	done
 
-	echo "[info] rTorrent process listening on port 5000"
+	echo "[info] rTorrent process listening on socket /tmp/rpc.socket"
 
 	# set rtorrent ip to current vpn ip (used when checking for changes on next run)
 	rtorrent_ip="${vpn_ip}"

@@ -158,9 +158,9 @@ protocol.pex.set = yes
 # Use a IP socket with scgi_port, or a Unix socket with scgi_local.
 # schedule can be used to set permissions on the unix socket.
 #
-scgi_port = 0.0.0.0:5000
-#scgi_local = /home/user/rtorrent/rpc.socket
-#schedule = scgi_permission,0,0,"execute.nothrow=chmod,\"g+w,o=\",/home/user/rtorrent/rpc.socket"
+#scgi_port = 0.0.0.0:5000
+scgi_local = /home/user/rtorrent/rpc.socket
+schedule = scgi_permission,0,0,"execute.nothrow=chmod,\"g+w,o=\",/home/user/rtorrent/rpc.socket"
 
 # Initialise ruTorrent plugins (required for rss and scheduler plugins) on startup 
 # (normally triggered by a browser opening the web ui).
