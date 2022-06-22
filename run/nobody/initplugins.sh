@@ -3,7 +3,7 @@
 echo "[info] Initialising ruTorrent plugins (checking rTorrent is running)..."
 
 # wait for rtorrent process to start (listen for port)
-while [[ $(netstat -lnt | awk '$6 == "LISTEN" && $4 ~ ".5000"') == "" ]]; do
+while [[ $(netstat -lxp | awk '$7 == "LISTENING" && $10 == "/tmp/rpc.socket"') == "" ]]; do
 	sleep 0.1
 done
 
