@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/dumb-init /bin/bash
 
 # define destination file path for rtorrent config file
 rtorrent_config="/config/rtorrent/config/rtorrent.rc"

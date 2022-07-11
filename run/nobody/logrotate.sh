@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/dumb-init /bin/bash
 
 log_path="/config/access.log"
 number_of_logs_to_keep=3

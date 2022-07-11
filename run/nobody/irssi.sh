@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/dumb-init /bin/bash
 
 # if autodl-irssi enabled then run, else log
 if [[ "${ENABLE_AUTODL_IRSSI}" == "yes" ]]; then

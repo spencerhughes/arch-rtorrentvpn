@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/dumb-init /bin/bash
 
 # function to enable/disable authentication for rpc2 and webui (/)
 function nginx_auth {
@@ -99,7 +99,7 @@ if [ ! -f "/config/nginx/config/nginx.conf" ]; then
 	if [[ -f "/etc/nginx/nginx.conf" && ! -L "/etc/nginx/nginx.conf" ]]; then
 		rm -rf '/etc/nginx/nginx.conf'
 	fi
-	
+
 	cp '/home/nobody/nginx/config/'* '/config/nginx/config/'
 
 else
