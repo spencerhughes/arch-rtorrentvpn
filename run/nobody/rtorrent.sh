@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/dumb-init /bin/bash
 
 # if rtorrent is already running then use xmlrpc to reconfigure
 if [[ "${rtorrent_running}" == "true" ]]; then

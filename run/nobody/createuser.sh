@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/dumb-init /bin/bash
 
 if [ -z "${1}" ]; then
 	echo "[crit] Missing username parameter, exiting script..."
